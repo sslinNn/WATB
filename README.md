@@ -1,2 +1,2 @@
 # WATB
- Weather Alerts Telegram Bot
+*Weather Alerts Telegram Bot*
