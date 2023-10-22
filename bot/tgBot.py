@@ -48,10 +48,20 @@ async def handle_location(message: types.Message, state: FSMContext):
     await state.update_data({'location': userLocation})
     await message.answer(f'Вы находитесь в: {userLocation}?', reply_markup=builder.as_markup(resize_keyboard=True))
 
+
+#for push
 @dp.message(F.text.lower() == 'да')
 async def whereIam(messaage: types.Message, state: FSMContext):
-    data = await state.get_data()
-    await messaage.answer(text=f'{data["location"]}')
+    try:
+        data = await state.get_data()
+        await messaage.answer(text=f'{data["location"]}')
+    except KeyError:
+        builder = ReplyKeyboardBuilder()
+        builder.row(types.KeyboardButton(text='Отправить геолокацию', request_location=True))
+        await state.set_state(User.location)
+        await messaage.answer('Произошла ошибка, пожалуйста, поделитесь геолокацией снова!',
+                             reply_markup=builder.as_markup(resize_keyboard=True))
+
 
 
 async def main():
