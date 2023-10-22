@@ -42,8 +42,7 @@ async def handle_location(message: types.Message):
     lat = message.location.latitude
     print(f'longitude {lon} | latitude {lat}')
 
-<<<<<<< Updated upstream
-=======
+#for push
 @dp.message(F.text.lower() == 'да')
 async def whereIam(messaage: types.Message, state: FSMContext):
     try:
@@ -55,7 +54,7 @@ async def whereIam(messaage: types.Message, state: FSMContext):
         await state.set_state(User.location)
         await messaage.answer('Произошла ошибка, пожалуйста, поделитесь геолокацией снова!',
                              reply_markup=builder.as_markup(resize_keyboard=True))
->>>>>>> Stashed changes
+
 
 
 async def main():
