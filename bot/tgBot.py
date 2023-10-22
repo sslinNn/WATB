@@ -63,6 +63,7 @@ async def whereIam(messaage: types.Message, state: FSMContext):
                              reply_markup=builder.as_markup(resize_keyboard=True))
 
 
+
 @dp.message(F.text.lower() == 'да')
 async def whereIam(messaage: types.Message, state: FSMContext):
     data = await state.get_data()
