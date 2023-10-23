@@ -42,7 +42,7 @@ async def handle_location(message: types.Message, state: FSMContext):
     builder = ReplyKeyboardBuilder()
     builder.row(
      types.KeyboardButton(text='Да'),
-        types.KeyboardButton(text='Нет')
+     types.KeyboardButton(text='Нет')
     )
     userLocation = getLocationFromCoordinates(TOKEN=TOKENYA, longitude=lon, latitude=lat)
     await state.set_state(User.location)
@@ -58,10 +58,12 @@ async def whereIam(messaage: types.Message, state: FSMContext):
         await messaage.answer(text=f'{data["location"]}')
     except KeyError:
         builder = ReplyKeyboardBuilder()
-        builder.row(types.KeyboardButton(text='Отправить геолокацию', request_location=True), types.KeyboardButton(text='Ввести вручную'))
+        builder.row(types.KeyboardButton(
+            text='Отправить геолокацию', request_location=True), types.KeyboardButton(text='Ввести вручную')
+        )
         await state.set_state(User.location)
         await messaage.answer('Произошла ошибка, пожалуйста, поделитесь геолокацией снова!',
-                             reply_markup=builder.as_markup(resize_keyboard=True))
+                              reply_markup=builder.as_markup(resize_keyboard=True))
 
 
 @dp.message(F.text.lower() == 'ввести вручную')
@@ -80,11 +82,11 @@ async def manuallyCity(message: types.Message, state: FSMContext, command: Comma
         city, country, fixed = getLocationFromCityName(TOKEN=TOKENYA, NAME=str(command.args))
         if fixed:
             await message.answer(f"Установлен город: {city}, страна: {country}",
-                             reply_markup=builder.as_markup(resize_keyboard=True))
+                                 reply_markup=builder.as_markup(resize_keyboard=True))
             await state.update_data({'location': city})
         else:
             await message.answer(f"Вы допустили ошибку, будет выбран город: {city}, страна: {country}",
-                             reply_markup=builder.as_markup(resize_keyboard=True))
+                                 reply_markup=builder.as_markup(resize_keyboard=True))
             await state.update_data({'location': city})
     else:
         await message.answer("Пожалуйста, введите ваш город после /city")
