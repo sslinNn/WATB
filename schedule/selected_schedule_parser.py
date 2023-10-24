@@ -57,7 +57,7 @@ def get_weekly_schedule_group(name):
                     lesson_number.append(j.text[0])
                     retention_time.append(j.text[1:])
                 td = i.find_all('td')
-                teachers.append(td[3].text.replace('\xad', ''))
+                teachers.append(td[3].text.replace('\xad', '').replace('\xa0', ' '))
                 lessons.append(td[2].text.replace('\xad', ''))
                 cabinet.append(td[4].text)
                 days.append(day)
@@ -68,7 +68,7 @@ def get_weekly_schedule_group(name):
                            'LESSON': lessons,
                            'TEACHER': teachers,
                            'CABINET': cabinet,
-                           'LESSON NUMBER': lesson_number,
+                           'NUM': lesson_number,
                            'TIME': retention_time})
     return df
 
@@ -109,7 +109,7 @@ def get_weekly_schedule_teacher(name):
                            'LESSON': lessons,
                            'GROUP': group,
                            'CABINET': cabinet,
-                           'LESSON NUMBER': lesson_number,
+                           'NUM': lesson_number,
                            'TIME': retention_time})
     return df
 
@@ -123,7 +123,7 @@ def get_daily_schedule(name, date):
             'DAY',
             'LESSON',
             'CABINET',
-            'LESSON NUMBER',
+            'NUM',
             'TIME']]#.to_numpy()
         if len(schedule) == 0:
             return 'Указанная неверная дата или выходной'
@@ -131,7 +131,7 @@ def get_daily_schedule(name, date):
             return schedule
     else:
         df = get_weekly_schedule_teacher(name)
-        schedule = df[df['DAY'] == date][['DAY', 'LESSON', 'GROUP', 'CABINET', 'LESSON NUMBER', 'TIME']]#.to_numpy()
+        schedule = df[df['DAY'] == date][['DAY', 'LESSON', 'GROUP', 'CABINET', 'NUM', 'TIME']]#.to_numpy()
         if len(schedule) == 0:
             return 'Указанная неверная дата или выходной'
         else:
