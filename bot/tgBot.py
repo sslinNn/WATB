@@ -9,8 +9,10 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
+
 from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName
 from bot.handlers.weatherHendler import getWather_hendler
+from statements.states import StartWithUser
 from statements.User import User
 
 load_dotenv()
@@ -23,47 +25,66 @@ router = Router()
 
 
 @dp.message(CommandStart())
-async def message_handler(message: types.Message):
+async def message_handler(message: types.Message, state: FSMContext):
     builder = ReplyKeyboardBuilder()
-    builder.row(types.KeyboardButton(text='Да!'), )
+    builder.row(types.KeyboardButton(text='Да!'))
+    await state.set_state(StartWithUser.yes)
     await message.answer(f'Привет! Хочешь узнать погоду?', reply_markup=builder.as_markup(resize_keyboard=True))
 
-@dp.message(F.text.lower() == 'да!')
+
+
+@dp.message(StartWithUser.yes)
 async def yes(message: types.Message, state: FSMContext):
-    builder = ReplyKeyboardBuilder()
-    builder.row(types.KeyboardButton(text='Отправить геолокацию', request_location=True))
-    await state.set_state(User.location)
-    await message.answer('Тогда поделись со мной своей геолокацией, пожалуйста!',
-                         reply_markup=builder.as_markup(resize_keyboard=True))
+    if message.text.lower() == 'да!':
+        await state.set_state(StartWithUser.location)
+        builder = ReplyKeyboardBuilder()
+        builder.row(types.KeyboardButton(text='Отправить геолокацию', request_location=True))
+        await message.answer('Тогда поделись со мной своей геолокацией, пожалуйста!',
+                             reply_markup=builder.as_markup(resize_keyboard=True))
+    else:
+        await message.answer('Я не понимаю, о чем ты')
 
-@dp.message(F.location)
-async def handle_location(message: types.Message, state: FSMContext):
-    lon = message.location.longitude
-    lat = message.location.latitude
-    builder = ReplyKeyboardBuilder()
-    builder.row(
-     types.KeyboardButton(text='Да'),
-     types.KeyboardButton(text='Нет')
-    )
-    userLocation = getLocationFromCoordinates(TOKEN=TOKENYA, longitude=lon, latitude=lat)
-    await state.set_state(User.location)
-    await state.update_data({'location': userLocation})
-    await message.answer(f'Вы находитесь в: {userLocation}?', reply_markup=builder.as_markup(resize_keyboard=True))
-
-@dp.message(F.text.lower() == 'да')
-async def whereIam(messaage: types.Message, state: FSMContext):
-    try:
-        data = await state.get_data()
-        await messaage.answer(text=f'{data["location"]}')
-    except KeyError:
+@dp.message(StartWithUser.location)
+async def location(message: types.Message, state: FSMContext):
+    if message.location is not None:
+        await state.set_state(StartWithUser.accepting)
+        lon = message.location.longitude
+        lat = message.location.latitude
         builder = ReplyKeyboardBuilder()
         builder.row(
-            types.KeyboardButton(text='Отправить геолокацию', request_location=True),
-            types.KeyboardButton(text='Ввести вручную')
+            types.KeyboardButton(text='Да'),
+            types.KeyboardButton(text='Нет')
         )
-        await state.set_state(User.location)
-        await messaage.answer('Произошла ошибка, пожалуйста, поделитесь геолокацией снова!',
-                              reply_markup=builder.as_markup(resize_keyboard=True))
+        userLocation = getLocationFromCoordinates(TOKEN=TOKENYA, longitude=lon, latitude=lat)
+        await state.update_data({'location': userLocation})
+        await message.answer(f'Вы находитесь в: {userLocation}?', reply_markup=builder.as_markup(resize_keyboard=True))
+    else:
+        await message.answer('Такого варианта ответа нет!')
+
+
+@dp.message(StartWithUser.accepting)
+async def accepting(message: types.Message, state: FSMContext):
+    if message.text.lower() in ['да', 'нет']:
+        await message.answer(text=f'Тут будет меню потом')
+    else:
+        await message.answer('Problema')
+
+
+
+# @dp.message(F.text.lower() == 'да')
+# async def whereIam(messaage: types.Message, state: FSMContext):
+#     try:
+#         data = await state.get_data()
+#         await messaage.answer(text=f'Тут будет меню потом')
+#     except KeyError:
+#         builder = ReplyKeyboardBuilder()
+#         builder.row(
+#             types.KeyboardButton(text='Отправить геолокацию', request_location=True),
+#             types.KeyboardButton(text='Ввести вручную')
+#         )
+#         await state.set_state(User.location)
+#         await messaage.answer('Произошла ошибка, пожалуйста, поделитесь геолокацией снова!',
+#                               reply_markup=builder.as_markup(resize_keyboard=True))
 
 
 @dp.message(F.text.lower() == 'ввести вручную')
