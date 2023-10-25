@@ -19,4 +19,3 @@ async def getWather_hendler(message: types.Message, state: FSMContext):
     except Exception as ex:
         logging.exception(ex)
         await message.answer(text='Я не знаю где вы находитесь!')
-
