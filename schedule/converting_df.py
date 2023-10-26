@@ -9,7 +9,7 @@ import pandas as pd
 import os
 import fitz
 from PIL import Image
-import cv2
+
 
 from schedule.selected_schedule_parser import get_daily_schedule, get_weekly_schedule_teacher, get_weekly_schedule_group
 from schedule.all_schedule_parser import getScheduleNHTK_groups, getScheduleNHTK_teachers
@@ -100,7 +100,7 @@ def cut_png(png_before, png_after):
     image.save(png_after)
     image.close()
 
+
 if __name__ == '__main__':
     df = get_weekly_schedule_group('09.07.11')
     df_to_png(df)
-

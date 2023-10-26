@@ -38,26 +38,19 @@ dp = Dispatcher()
 
 КАРОЧЕ ТО, ЧТО ЗАКОММЕНЧЕНО НАДО ПОДСТРОИТЬ К РУЧНОМУ ВВОДУ МЕСТОПОЛОЖЕНИЯ (StartWithUser.py def's: accepting, location)
 А ТО, ЧТО НЕ ЗАКОММЕНЧЕНО НАДО РАСПИХАТЬ ПО ХЭНДЛЕРАМ
-Я ТАМ УЖЕ СДЕЛАЛ МЕНЮ, В НЕГО ТОЛЬКО КНОПКУ ВВЕСТИ КОД НАДО ДОБАВИТЬ ПОИДЕЕ
+Я МЕНЮШКУ ТВОЮ ПЕРЕДЕЛАЛ КНОПКА ВВЕСТИ КОД ЕСТЬ, НО КОГДА НА НЕЁ ЖМЕШЬ ПЕРЕКИДЫВАЕТ НА ОБЫЧНЫЙ ХЭНДЛЕР И ВСЁ ЛОМАЕТСЯ,
+ЗАВТРА ЗАЙМУСЬ ЭТИМ ВОПРОСОМ
+
 ВООБЩЕ, БЫЛО БЫ ЗДОРОВО, ЕСЛИ БЫ ТЫ ПОПЫТАЛСЯ ХОТЯБЫ РАЗОБРАТСЯ ЧЕ Я НАМУДРИЛ СО СТЕЙТАМИ И ПЕРЕХОДОМ ПО ХЕНДЛЕРАМ
 ДУМАЮ, ТАК ЯСНЕЕ СТАНЕТ КАК ПРОДОЛЖАТЬ ДЕЛАТЬ ВООБЩЕ
 """
 
-@dp.message(F.text.lower() == 'в меню')
-async def menu(message: types.Message):
-    builder = ReplyKeyboardBuilder()
-    builder.row(
-        types.KeyboardButton(text='Настройки'),
-        types.KeyboardButton(text='Какой город у меня указан?'),
-        types.KeyboardButton(text='Ввести секретный код')
-    )
-    builder.adjust(2)
-    await message.answer(f'Главное меню', reply_markup=builder.as_markup(resize_keyboard=True))
+
 
 @dp.message(F.text.lower() == 'ввести секретный код')
 async def enter_code(message: types.Message):
     builder = ReplyKeyboardBuilder()
-    builder.row(types.KeyboardButton(text='В меню'))
+    builder.row(types.KeyboardButton(text='Меню'))
     await message.answer(f'Введите код после /code', reply_markup=builder.as_markup(resize_keyboard=True))
 
 

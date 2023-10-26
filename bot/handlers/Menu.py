@@ -27,8 +27,10 @@ async def menu(message: types.Message, state: FSMContext):
         builder = ReplyKeyboardBuilder()
         builder.row(
             types.KeyboardButton(text='Настройки'),
-            types.KeyboardButton(text='Погода')
+            types.KeyboardButton(text='Погода'),
+            types.KeyboardButton(text='Ввести секретный код')
         )
+        builder.adjust(2)
         await message.answer(
             f'Меню:',
             reply_markup=builder.as_markup(resize_keyboard=True)
@@ -44,7 +46,7 @@ async def menuPicker(message: types.Message, state: FSMContext):
         builder = ReplyKeyboardBuilder()
         builder.row(
             types.KeyboardButton(text='Изменить месторасположения'),
-            types.KeyboardButton(text='Главное меню')
+            types.KeyboardButton(text='Меню')
         )
         builder.adjust(1)
         data = await state.get_data()

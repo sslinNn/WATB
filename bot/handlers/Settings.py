@@ -30,13 +30,15 @@ async def changeLocate(message: types.Message, state: FSMContext):
                 text=f'Отправь локацию, или введи вручную',
                 reply_markup=builder.as_markup(resize_keyboard=True)
             )
-        elif message.text.lower() == 'главное меню':
+        elif message.text.lower() == 'меню':
             await state.set_state(Menu.menuPicker)
             builder = ReplyKeyboardBuilder()
             builder.row(
                 types.KeyboardButton(text='Настройки'),
-                types.KeyboardButton(text='Погода')
+                types.KeyboardButton(text='Погода'),
+                types.KeyboardButton(text='Ввести секретный код')
             )
+            builder.adjust(2)
             await message.answer(
                 f'Меню:',
                 reply_markup=builder.as_markup(resize_keyboard=True))
