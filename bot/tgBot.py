@@ -46,7 +46,11 @@ dp = Dispatcher()
 @dp.message(F.text.lower() == 'в меню')
 async def menu(message: types.Message):
     builder = ReplyKeyboardBuilder()
-    builder.row(types.KeyboardButton(text='Настройки'), types.KeyboardButton(text='Какой город у меня указан?'), types.KeyboardButton(text='Ввести секретный код'))
+    builder.row(
+        types.KeyboardButton(text='Настройки'),
+        types.KeyboardButton(text='Какой город у меня указан?'),
+        types.KeyboardButton(text='Ввести секретный код')
+    )
     builder.adjust(2)
     await message.answer(f'Главное меню', reply_markup=builder.as_markup(resize_keyboard=True))
 
@@ -58,12 +62,20 @@ async def enter_code(message: types.Message):
 
 
 @dp.message(Command(commands=['code']))
-async def answer_to_code(message: types.Message, state: FSMContext, command: CommandObject):
+async def answer_to_code(message: types.Message, command: CommandObject):
     if command.args.lower() == 'nhtk' or command.args.lower() == 'нхтк':
         builder = ReplyKeyboardBuilder()
-        builder.row(types.KeyboardButton(text='Студент'), types.KeyboardButton(text='Преподаватель'), types.KeyboardButton(text='В меню'))
+        builder.row(
+            types.KeyboardButton(text='Студент'),
+            types.KeyboardButton(text='Преподаватель'),
+            types.KeyboardButton(text='В меню')
+        )
         builder.adjust(2)
-        await message.answer(f'Вы ввели код: {command.args}, вы явно о чем-то знаете! Если вы хотите получать расписание, пожалуйста, скажите кто вы?', reply_markup=builder.as_markup(resize_keyboard=True))
+        await message.answer(
+            f'Вы ввели код: {command.args}, вы явно о чем-то знаете!'
+            f' Если вы хотите получать расписание, пожалуйста, скажите кто вы?',
+            reply_markup=builder.as_markup(resize_keyboard=True)
+        )
 
 @dp.message(F.text.lower() == 'студент')
 async def select_group(message: types.Message):
