@@ -13,11 +13,12 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
 
-from statements.states import StartWithUser, Menu, Settings
+from statements.states import StartWithUser, Menu, Settings, Secret
 
 from handlers.StartWithUser import message_handler, yes, location, accepting
 from handlers.Menu import menu, menuPicker
 from handlers.Settings import changeLocate
+from handlers.SecretCode import code, nhtk, get_role
 
 from schedule.selected_schedule_parser import get_daily_schedule, get_weekly_schedule_teacher, get_weekly_schedule_group
 from schedule.all_schedule_parser import getScheduleNHTK_groups, getScheduleNHTK_teachers
@@ -47,53 +48,6 @@ dp = Dispatcher()
 
 
 
-@dp.message(F.text.lower() == 'ввести секретный код')
-async def enter_code(message: types.Message):
-    builder = ReplyKeyboardBuilder()
-    builder.row(types.KeyboardButton(text='Меню'))
-    await message.answer(f'Введите код после /code', reply_markup=builder.as_markup(resize_keyboard=True))
-
-
-@dp.message(Command(commands=['code']))
-async def answer_to_code(message: types.Message, command: CommandObject):
-    if command.args.lower() == 'nhtk' or command.args.lower() == 'нхтк':
-        builder = ReplyKeyboardBuilder()
-        builder.row(
-            types.KeyboardButton(text='Студент'),
-            types.KeyboardButton(text='Преподаватель'),
-            types.KeyboardButton(text='В меню')
-        )
-        builder.adjust(2)
-        await message.answer(
-            f'Вы ввели код: {command.args}, вы явно о чем-то знаете!'
-            f' Если вы хотите получать расписание, пожалуйста, скажите кто вы?',
-            reply_markup=builder.as_markup(resize_keyboard=True)
-        )
-
-@dp.message(F.text.lower() == 'студент')
-async def select_group(message: types.Message):
-    df = getScheduleNHTK_groups()
-    groups = df['GroupName'].tolist()
-    print(len(groups))
-    builder = ReplyKeyboardBuilder()
-    for i in groups:
-        builder.add(types.KeyboardButton(text=str(i)))
-    builder.adjust(4)
-    builder.row(types.KeyboardButton(text='В меню'))  # Отдельная строка для "В меню"
-    await message.answer(
-        "Выберите группу из списка или введите вручную",
-        reply_markup=builder.as_markup(resize_keyboard=True),
-    )
-
-
-@dp.message(F.text.lower() == 'преподаватель')
-async def select_teacher(message: types.Message):
-    builder = ReplyKeyboardBuilder()
-    builder.row(types.KeyboardButton(text='В меню'))  # Отдельная строка для "В меню"
-    await message.answer(
-        "Увы, кнопок нет, но вы можете ввести свою фамилию (например: Иванов. И. И.)",
-        reply_markup=builder.as_markup(resize_keyboard=True),
-    )
 
 
 @dp.message(Command(commands=['tomorrow_schedule']))
@@ -167,6 +121,9 @@ async def main():
     dp.message.register(menu, Menu.menu)
     dp.message.register(menuPicker, Menu.menuPicker)
     dp.message.register(changeLocate, Settings.location)
+    # dp.message.register(code, Secret.secretKey)
+    # dp.message.register(nhtk, Secret.nhtkKey)
+    # dp.message.register(get_role, Secret.getrole)
     await dp.start_polling(bott)
 
 
