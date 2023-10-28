@@ -6,6 +6,7 @@ from reportlab.lib.fonts import addMapping
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import pandas as pd
+from table_style import table_style
 import os
 import fitz
 from PIL import Image
@@ -35,27 +36,12 @@ def df_to_pdf(df, file_path):
     array_of_arrays = df_to_array(df)
 
     #settings
-    pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))  # Замените 'Arial.ttf' на путь к вашему шрифту
+    pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
     addMapping('Arial', 0, 0, 'Arial')
     pdf = SimpleDocTemplate(file_path, pagesize=letter)
     table = Table(array_of_arrays)
-    table_style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Задний фон для заголовков
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Цвет текста для заголовков
-        ('FONTNAME', (0, 0), (-1, 0), 'Arial'),  # Шрифт для заголовков
-        ('FONTSIZE', (0, 0), (-1, 0), 12),  # Размер шрифта для заголовков
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Отступ снизу для заголовков
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Задний фон для остальных ячеек
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Рамка для ячеек
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Выравнивание по центру для ячеек
-        ('FONTNAME', (0, 1), (-1, -1), 'Arial'),  # Шрифт для остальных ячеек
-        ('FONTSIZE', (0, 1), (-1, -1), 8.5),  # Размер шрифта для остальных ячеек
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Выравнивание по вертикали для ячеек
-    ])
-
     table.setStyle(table_style)
 
-    # Добавление таблицы на документ
     elements = [table]
     pdf.build(elements)
 
