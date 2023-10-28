@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from weather.getWeather import getWeather
 
-from bot.statements.states import StartWithUser, Menu, Settings
+from bot.statements.states import StartWithUser, Menu, Settings, Secret
 
 
 
@@ -17,7 +17,6 @@ TOKENYA = os.getenv('YANDEX_API_KEY')
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-
 
 
 @dp.message(Menu.menu)
@@ -62,5 +61,20 @@ async def menuPicker(message: types.Message, state: FSMContext):
         except Exception as ex:
             logging.exception(ex)
             await message.answer(text='Я не знаю где вы находитесь!')
+    elif message.text.lower() == 'ввести секретный код':
+        await state.set_state(Secret.secretKey)
+        try:
+            code = await state.get_data()
+            builder = ReplyKeyboardBuilder()
+            builder.row(
+                types.KeyboardButton(text='Ввести еще один код'),
+                types.KeyboardButton(text='Меню')
+            )
+            await message.answer(text=f'Вы ранее ввели код: {code["getrole"]}', reply_markup=builder.as_markup(resize_keyboard=True))
+            await state.set_state(Secret.secretKey)
+        except Exception as ex:
+            await state.set_state(Secret.secretKey)
+            logging.exception(ex)
+            await message.answer(text='Введите код!')
     else:
         await message.answer('Такого варианта ответа нет!')
