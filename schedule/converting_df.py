@@ -6,7 +6,7 @@ from reportlab.lib.fonts import addMapping
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import pandas as pd
-from table_style import table_style
+from schedule.table_styles import table_style
 import os
 import fitz
 from PIL import Image
@@ -34,11 +34,10 @@ def df_to_array(df):
 
 def df_to_pdf(df, file_path):
     array_of_arrays = df_to_array(df)
-
     #settings
     pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
     addMapping('Arial', 0, 0, 'Arial')
-    pdf = SimpleDocTemplate(file_path, pagesize=letter)
+    pdf = SimpleDocTemplate(file_path)
     table = Table(array_of_arrays)
     table.setStyle(table_style)
 
@@ -47,16 +46,19 @@ def df_to_pdf(df, file_path):
 
 
 def df_to_png(df):
-    df_to_pdf(df, 'output/output.pdf')
+
     output_dir = 'output'
     os.makedirs(output_dir, exist_ok=True)
+    df_to_pdf(df, 'output/output.pdf')
     pdf_document = fitz.open('output/output.pdf')
     for page_number in range(len(pdf_document)):
         page = pdf_document.load_page(page_number)
         image = page.get_pixmap()
-        image.save(os.path.join(output_dir, 'output.png'), "PNG")
+        dpi = 300
+        image.set_dpi(dpi, dpi)
+        image.save(os.path.join(output_dir, 'output.jpeg'), "JPEG", jpg_quality=200)
     pdf_document.close()
-    transparent_png('output/output.png', 'output/output.png')
+    transparent_png('output/output.jpeg', 'output/output.png')
     cut_png('output/output.png', 'output/output.png')
     return 'output/output.png'
 
