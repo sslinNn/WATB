@@ -139,4 +139,5 @@ def get_daily_schedule(name, date):
 
 
 if __name__ == '__main__':
-    print(get_daily_schedule('Воробьев А. А.', '26.10.2023'))
+    # print(get_daily_schedule('Воробьев А. А.', '26.10.2023'))
+    print(get_weekly_schedule_group('09.07.10'))
