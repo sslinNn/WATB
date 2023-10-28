@@ -12,9 +12,9 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
-
+from schedule.converting_df import df_to_png
 from statements.states import StartWithUser, Menu, Settings, Secret
-
+from aiogram.types import InputMediaPhoto, FSInputFile
 from handlers.StartWithUser import message_handler, yes, location, accepting
 from handlers.Menu import menu, menuPicker
 from handlers.Settings import changeLocate
@@ -61,12 +61,9 @@ async def tomorrow_schedule(message: types.Message):
     df = get_daily_schedule('09.07.11', tomorrow_new)
 
     df_str = df.to_string(index=False)
-    print(df_str)
-    await message.answer(
-        f'<pre>{df_str}</pre>',
-        parse_mode='HTML',
-        reply_markup=builder.as_markup(resize_keyboard=True),
-    )
+    path = df_to_png(df)
+    photo = FSInputFile('output/output.png')
+    await bot.send_photo(chat_id=message.chat.id, photo=photo)
 
 
 @dp.message(Command(commands=['weekly_schedule']))
@@ -76,12 +73,9 @@ async def tomorrow_schedule(message: types.Message):
     builder.row(types.KeyboardButton(text='В меню'))
     df = get_weekly_schedule_group('09.07.11')
     df_str = df.to_string(index=False)
-    print(df_str)
-    await message.answer(
-        f'<pre>{df_str}</pre>',
-        parse_mode='HTML',
-        reply_markup=builder.as_markup(resize_keyboard=True),
-    )
+    path = df_to_png(df)
+    photo = FSInputFile('output/output.png')
+    await bot.send_photo(chat_id=message.chat.id, photo=photo)
 
 
 
