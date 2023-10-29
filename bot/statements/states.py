@@ -15,6 +15,12 @@ class Menu(StatesGroup):
     weather = State()
 
 
+class Secrets(StatesGroup):
+    code = State()
+    nhtk = State()
+    nhtkGroup = State()
+    schedulePicker = State()
+
 class Settings(StatesGroup):
     location = State()
 

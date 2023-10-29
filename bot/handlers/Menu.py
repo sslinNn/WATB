@@ -1,13 +1,17 @@
 import logging
 import os
 from aiogram import Bot, Dispatcher, types
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
 
 from weather.getWeather import getWeather
 
-from bot.statements.states import StartWithUser, Menu, Settings, Secret
+
+from bot.statements.states import StartWithUser, Menu, Settings, Secrets
+
+from bot.keyboard.MenuKB import getMenuKB
+from bot.keyboard.SettingsKB import getSettingsKB
+
 
 
 
@@ -23,17 +27,7 @@ dp = Dispatcher()
 async def menu(message: types.Message, state: FSMContext):
     if message.text.lower() == 'меню':
         await state.set_state(Menu.menuPicker)
-        builder = ReplyKeyboardBuilder()
-        builder.row(
-            types.KeyboardButton(text='Настройки'),
-            types.KeyboardButton(text='Погода'),
-            types.KeyboardButton(text='Ввести секретный код')
-        )
-        builder.adjust(2)
-        await message.answer(
-            f'Меню:',
-            reply_markup=builder.as_markup(resize_keyboard=True)
-        )
+        await message.answer(f'Меню:', reply_markup=getMenuKB())
     else:
         await message.answer('Такого варианта ответа нет!')
 
@@ -42,14 +36,8 @@ async def menu(message: types.Message, state: FSMContext):
 async def menuPicker(message: types.Message, state: FSMContext):
     if message.text.lower() == 'настройки':
         await state.set_state(Settings.location)
-        builder = ReplyKeyboardBuilder()
-        builder.row(
-            types.KeyboardButton(text='Изменить месторасположения'),
-            types.KeyboardButton(text='Меню')
-        )
-        builder.adjust(1)
         data = await state.get_data()
-        await message.answer(f'Вы тут: {data["location"]}', reply_markup=builder.as_markup(resize_keyboard=True))
+        await message.answer(f'Вы тут: {data["location"]}', reply_markup=getSettingsKB())
         await state.set_state(Settings.location)
 
     elif message.text.lower() == 'погода':
@@ -62,19 +50,7 @@ async def menuPicker(message: types.Message, state: FSMContext):
             logging.exception(ex)
             await message.answer(text='Я не знаю где вы находитесь!')
     elif message.text.lower() == 'ввести секретный код':
-        await state.set_state(Secret.secretKey)
-        try:
-            code = await state.get_data()
-            builder = ReplyKeyboardBuilder()
-            builder.row(
-                types.KeyboardButton(text='Ввести еще один код'),
-                types.KeyboardButton(text='Меню')
-            )
-            await message.answer(text=f'Вы ранее ввели код: {code["getrole"]}', reply_markup=builder.as_markup(resize_keyboard=True))
-            await state.set_state(Secret.secretKey)
-        except Exception as ex:
-            await state.set_state(Secret.secretKey)
-            logging.exception(ex)
-            await message.answer(text='Введите код!')
+        await state.set_state(Secrets.code)
+        await message.answer('Введите секретный код!', reply_markup=types.ReplyKeyboardRemove())
     else:
         await message.answer('Такого варианта ответа нет!')
