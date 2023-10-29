@@ -69,9 +69,11 @@ def distant_colors(df):
     colors = []
     for row in df.itertuples():
         if 'дист' in row.CAB:
-            colors.append('#0AFF79')
+            colors.append('#8AF5C4')
         elif 'ЭКЗАМЕН' in row.LESSON:
             colors.append('#E1707C')
+        elif 'Дьяченко' in row.TEACHER:
+            colors.append('#F9F694')
         else:
             colors.append('#EBF0F8')
     return colors
