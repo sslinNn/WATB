@@ -4,11 +4,10 @@ import re
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram.fsm.context import FSMContext
+from aiogram.types import FSInputFile
 from dotenv import load_dotenv
 
-from weather.getWeather import getWeather
-
-from bot.statements.states import StartWithUser, Menu, Settings, Secrets
+from bot.statements.states import Menu, Secrets
 
 from schedule.selected_schedule_parser import get_daily_schedule, get_weekly_schedule_group
 from schedule.all_schedule_parser import getScheduleNHTK_groups
@@ -106,14 +105,10 @@ async def schedulePicker(message: types.Message, state: FSMContext):
         tomorrow = today + datetime.timedelta(days=1)
         tomorrow_new = '.'.join(str(tomorrow).split('-')[::-1])
         df = get_daily_schedule(group["group"], tomorrow_new)
-
         df_str = df.to_string(index=False)
         print(df_str)
-        await message.answer(
-            f'<pre>{df_str}</pre>',
-            parse_mode='HTML',
-            reply_markup=builder.as_markup(resize_keyboard=True),
-        )
+        photo = FSInputFile('output/output.png')
+        await bot.send_photo(chat_id=message.chat.id, photo=photo)
     elif message.text.lower() == 'расписание на неделю':
         builder = ReplyKeyboardBuilder()
         builder.row(types.KeyboardButton(text='Меню'))
@@ -122,11 +117,8 @@ async def schedulePicker(message: types.Message, state: FSMContext):
         df = get_weekly_schedule_group(group["group"])
         df_str = df.to_string(index=False)
         print(df_str)
-        await message.answer(
-            f'<pre>{df_str}</pre>',
-            parse_mode='HTML',
-            reply_markup=builder.as_markup(resize_keyboard=True),
-        )
+        photo = FSInputFile('output/output.png')
+        await bot.send_photo(chat_id=message.chat.id, photo=photo)
     elif message.text.lower() == 'меню':
         await state.set_state(Menu.menuPicker)
         await message.answer('Меню: ', reply_markup=getMenuKB())

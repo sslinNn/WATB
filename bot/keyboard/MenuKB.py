@@ -7,4 +7,3 @@ def getMenuKB():
     kb.button(text="Ввести секретный код")
     kb.adjust(2)
     return kb.as_markup(resize_keyboard=True)
-

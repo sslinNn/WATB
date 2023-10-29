@@ -6,13 +6,10 @@ from dotenv import load_dotenv
 
 from weather.getWeather import getWeather
 
-
 from bot.statements.states import StartWithUser, Menu, Settings, Secrets
 
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
-
-
 
 
 load_dotenv()
