@@ -82,13 +82,15 @@ async def accepting(message: types.Message, state: FSMContext):
             if fixed:
                 await state.update_data({'location': city})
                 await message.answer(
-                    f'Кажется вы неправильно ввели город: {message.text.title()}, вы находитесь в: {city}, страна {country}?', reply_markup=, reply_markup=yesOrNo()
+                    f'Кажется вы неправильно ввели город: {message.text.title()}, '
+                    f'вы находитесь в: {city}, страна {country}?',
+                    reply_markup=yesOrNo()
                 )
             else:
                 await state.update_data({'location': city})
                 await message.answer(
                     f'Вы находитесь в: {city}, страна {country}?',
-                    reply_markup=, reply_markup=yesOrNo()
+                    reply_markup=yesOrNo()
                 )
 
     except AttributeError:
