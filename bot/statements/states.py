@@ -13,7 +13,7 @@ class Menu(StatesGroup):
 
     sattings = State()
     weather = State()
-    secretKey = State()
+
 
 class Secrets(StatesGroup):
     code = State()
@@ -23,3 +23,10 @@ class Secrets(StatesGroup):
 
 class Settings(StatesGroup):
     location = State()
+
+
+class Secret(StatesGroup):
+    secretKey = State()
+    nhtkKey = State()
+    role = State()
+    getrole = State()

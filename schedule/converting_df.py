@@ -6,6 +6,7 @@ from reportlab.lib.fonts import addMapping
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import pandas as pd
+from schedule.table_styles import table_style
 import os
 import fitz
 from PIL import Image
@@ -33,44 +34,31 @@ def df_to_array(df):
 
 def df_to_pdf(df, file_path):
     array_of_arrays = df_to_array(df)
-
     #settings
-    pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))  # Замените 'Arial.ttf' на путь к вашему шрифту
+    pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
     addMapping('Arial', 0, 0, 'Arial')
-    pdf = SimpleDocTemplate(file_path, pagesize=letter)
+    pdf = SimpleDocTemplate(file_path)
     table = Table(array_of_arrays)
-    table_style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Задний фон для заголовков
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Цвет текста для заголовков
-        ('FONTNAME', (0, 0), (-1, 0), 'Arial'),  # Шрифт для заголовков
-        ('FONTSIZE', (0, 0), (-1, 0), 12),  # Размер шрифта для заголовков
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Отступ снизу для заголовков
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Задний фон для остальных ячеек
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Рамка для ячеек
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Выравнивание по центру для ячеек
-        ('FONTNAME', (0, 1), (-1, -1), 'Arial'),  # Шрифт для остальных ячеек
-        ('FONTSIZE', (0, 1), (-1, -1), 8.5),  # Размер шрифта для остальных ячеек
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Выравнивание по вертикали для ячеек
-    ])
-
     table.setStyle(table_style)
 
-    # Добавление таблицы на документ
     elements = [table]
     pdf.build(elements)
 
 
 def df_to_png(df):
-    df_to_pdf(df, 'output/output.pdf')
+
     output_dir = 'output'
     os.makedirs(output_dir, exist_ok=True)
+    df_to_pdf(df, 'output/output.pdf')
     pdf_document = fitz.open('output/output.pdf')
     for page_number in range(len(pdf_document)):
         page = pdf_document.load_page(page_number)
         image = page.get_pixmap()
-        image.save(os.path.join(output_dir, 'output.png'), "PNG")
+        dpi = 300
+        image.set_dpi(dpi, dpi)
+        image.save(os.path.join(output_dir, 'output.jpeg'), "JPEG", jpg_quality=200)
     pdf_document.close()
-    transparent_png('output/output.png', 'output/output.png')
+    transparent_png('output/output.jpeg', 'output/output.png')
     cut_png('output/output.png', 'output/output.png')
     return 'output/output.png'
 

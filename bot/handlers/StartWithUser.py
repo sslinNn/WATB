@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv
 
-from weather.getLocaion import getLocationFromCoordinates
+from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName
 
 from bot.statements.states import StartWithUser, Menu
 
@@ -77,10 +77,20 @@ async def accepting(message: types.Message, state: FSMContext):
             await message.answer(text=f'Введите название вашего месторасположения')
         else:
             await state.set_state(StartWithUser.accepting)
-            await state.update_data({'location': message.text.title()})
-            await message.answer(
-                f'Вы находитесь в: {message.text.title()}?', reply_markup=yesOrNo()
-            )
+
+            city, country, fixed = getLocationFromCityName(TOKENYA, message.text.title())
+            if fixed:
+                await state.update_data({'location': city})
+                await message.answer(
+                    f'Кажется вы неправильно ввели город: {message.text.title()}, вы находитесь в: {city}, страна {country}?', reply_markup=, reply_markup=yesOrNo()
+                )
+            else:
+                await state.update_data({'location': city})
+                await message.answer(
+                    f'Вы находитесь в: {city}, страна {country}?',
+                    reply_markup=, reply_markup=yesOrNo()
+                )
+
     except AttributeError:
         await state.set_state(StartWithUser.accepting)
         lon = message.location.longitude

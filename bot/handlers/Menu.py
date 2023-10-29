@@ -6,10 +6,12 @@ from dotenv import load_dotenv
 
 from weather.getWeather import getWeather
 
+
 from bot.statements.states import StartWithUser, Menu, Settings, Secrets
 
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
+
 
 
 
@@ -19,7 +21,6 @@ TOKENYA = os.getenv('YANDEX_API_KEY')
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-
 
 
 @dp.message(Menu.menu)
