@@ -1,5 +1,7 @@
 from reportlab.platypus import TableStyle
-from reportlab.lib import colors
+from reportlab.lib import colors, styles
+
+
 
 table_style = TableStyle([
     ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Задний фон для заголовков
@@ -13,4 +15,5 @@ table_style = TableStyle([
     ('FONTNAME', (0, 1), (-1, -1), 'Arial'),  # Шрифт для остальных ячеек
     ('FONTSIZE', (0, 1), (-1, -1), 8.5),  # Размер шрифта для остальных ячеек
     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Выравнивание по вертикали для ячеек
+    ('FONTWEIGHT', (0, 0), (-1, -1), 'BOLD'),
 ])
