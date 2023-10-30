@@ -11,11 +11,10 @@ def getWeather(locate: str, weather_api_key: str):
     api_url_base = f'http://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={locate}&aqi=yes'
     weather_res = requests.get(url=api_url_base)
     condition = weather_res.json()["current"]["condition"]["text"]
-
-    print(weather_res.json())
+    # print(weather_res.json())
     return (f'Местное время: {weather_res.json()["location"]["localtime"]} \n'
+            f'Температура: {weather_res.json()["current"]["temp_c"]}°C | '
             f'{weather_res.json()["current"]["temp_f"]}°F \n'
-            f'{weather_res.json()["current"]["temp_c"]}°C \n'
             f'Направление ветра: {wind_dir(weather_res.json()["current"]["wind_degree"])}\n'
             f'Ветер: {weather_res.json()["current"]["wind_kph"]} км/ч \n'
             f'{trans(condition)} !!!\n'

@@ -24,6 +24,7 @@ async def message_handler(message: types.Message, state: FSMContext):
     builder = ReplyKeyboardBuilder()
     builder.row(types.KeyboardButton(text='Да!'))
     await state.set_state(StartWithUser.yes)
+    # print(message.from_user.id)
     await message.answer(f'Привет! Хочешь узнать погоду?', reply_markup=builder.as_markup(resize_keyboard=True))
 
 
