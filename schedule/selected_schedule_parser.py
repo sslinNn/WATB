@@ -67,8 +67,8 @@ def get_weekly_schedule_group(name):
         df = pd.DataFrame({'DAY': days,
                            'LESSON': lessons,
                            'TEACHER': teachers,
-                           'CABINET': cabinet,
-                           'NUM': lesson_number,
+                           'CAB': cabinet,
+                           'N': lesson_number,
                            'TIME': retention_time})
     return df
 
@@ -108,8 +108,8 @@ def get_weekly_schedule_teacher(name):
         df = pd.DataFrame({'DAY': days,
                            'LESSON': lessons,
                            'GROUP': group,
-                           'CABINET': cabinet,
-                           'NUM': lesson_number,
+                           'CAB': cabinet,
+                           'N': lesson_number,
                            'TIME': retention_time})
     return df
 
@@ -122,8 +122,8 @@ def get_daily_schedule(name, date):
         schedule = df[df['DAY'] == date][[
             'DAY',
             'LESSON',
-            'CABINET',
-            'NUM',
+            'CAB',
+            'N',
             'TIME']]#.to_numpy()
         if len(schedule) == 0:
             return 'Указанная неверная дата или выходной'
@@ -131,7 +131,7 @@ def get_daily_schedule(name, date):
             return schedule
     else:
         df = get_weekly_schedule_teacher(name)
-        schedule = df[df['DAY'] == date][['DAY', 'LESSON', 'GROUP', 'CABINET', 'NUM', 'TIME']]#.to_numpy()
+        schedule = df[df['DAY'] == date][['DAY', 'LESSON', 'GROUP', 'CAB', 'N', 'TIME']]#.to_numpy()
         if len(schedule) == 0:
             return 'Указанная неверная дата или выходной'
         else:
