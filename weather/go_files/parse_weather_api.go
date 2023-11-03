@@ -17,7 +17,6 @@ type HourlyData struct {
 }
 
 func main() {
-
 	data, err := ioutil.ReadFile("input.json")
 	if err != nil {
 		fmt.Println("Ошибка чтения файла:", err)

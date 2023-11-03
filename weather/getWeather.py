@@ -22,8 +22,8 @@ def getWeather(locate: str, weather_api_key: str):
     weather_res = requests.get(url=api_url_base)
     condition = weather_res.json()["current"]["condition"]["text"]
     return (f'Местное время: {weather_res.json()["location"]["localtime"]} \n'
-            f'Температура: {weather_res.json()["current"]["temp_c"]}°C | '
             f'{weather_res.json()["current"]["temp_f"]}°F \n'
+            f'{weather_res.json()["current"]["temp_c"]}°C \n'
             f'Направление ветра: {wind_dir(weather_res.json()["current"]["wind_degree"])}\n'
             f'Ветер: {weather_res.json()["current"]["wind_kph"]} км/ч \n'
             f'{trans(condition)}!!!\n'
@@ -63,7 +63,7 @@ def feel_like(temp_c, wind_kph):
 
 
 def parse_api(locate: str, weather_api_key: str):
-    api_url_forecast = f'http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={locate}&aqi=yes'
+    api_url_forecast = f'http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={locate}&lang=ru&aqi=yes'
     weather_res = requests.get(url=api_url_forecast)
     date = convert_parse_date_to_normal_date(weather_res.json()["forecast"]["forecastday"][0]['date'])
     per_hour = weather_res.json()["forecast"]["forecastday"][0]['hour']
@@ -71,16 +71,17 @@ def parse_api(locate: str, weather_api_key: str):
     temp_c = []
     condition = []
     wind = []
+    img_condition = []
     for i in per_hour:
         hour.append(i['time'].split(' ')[1])
         temp_c.append(i['temp_c'])
-        condition.append(trans(i['condition']['text']))
+        condition.append(i['condition']['text'])
         wind.append(i['wind_kph'])
+        img_condition.append(f"https:{i['condition']['icon']}")
         pass
-    df = pd.DataFrame({'Hour': hour, 'Temp_C': temp_c, 'Condition': condition, 'Wind': wind})
+    df = pd.DataFrame({'Hour': hour, 'Temp_C': temp_c, 'Condition': condition, 'Wind': wind, 'Icon': img_condition})
     df = df.set_index('Hour').T
-
-    return df
+    return df, [weather_res.json()["forecast"]["forecastday"][0]['astro']['sunrise'], weather_res.json()["forecast"]["forecastday"][0]['astro']['sunset']]
 
 
 def getWeatherForecast(locate: str, weather_api_key: str):
@@ -91,6 +92,7 @@ def getWeatherForecast(locate: str, weather_api_key: str):
         f'Прогноз погоды на {date[2]} {date[1]}\n'
         f'Днем в среднем: {weather_res.json()["forecast"]["forecastday"][0]["day"]["avgtemp_c"]}°C ({weather_res.json()["forecast"]["forecastday"][0]["day"]["avgtemp_f"]}°F)'
     )
+
 
 def convert_parse_date_to_normal_date(date):
     months = {
@@ -114,31 +116,29 @@ def convert_parse_date_to_normal_date(date):
     return parts
 
 
-def download_json(locate: str, weather_api_key: str):
-    json_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={locate}&aqi=yes"
-    response = requests.get(json_url)
-    data = response.json()
-    with open("input.json", "w") as file:
-        json.dump(data["forecast"]["forecastday"][0]['hour'], file)
+# def download_json(locate: str, weather_api_key: str):
+#     json_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={locate}&lang=ru&aqi=yes"
+#     response = requests.get(json_url)
+#     data = response.json()
+#     with open("input.json", "w") as file:
+#         json.dump(data["forecast"]["forecastday"][0]['hour'], file)
+#
+#
+# def retrieve_processed_data():
+#     subprocess.run(["go", "run", "parse_weather_api.go"])
+#     with open('output.json', 'r') as file:
+#         data = json.load(file)
+#     return data
 
 
-def retrieve_processed_data():
-    subprocess.run(["go", "run", "parse_weather_api.go"])
-    with open('output.json', 'r') as file:
-        data = json.load(file)
-    return data
-
-
-def forecast_weather(locate: str, weather_api_key: str):
-    download_json(locate, weather_api_key)
-    dic = retrieve_processed_data()
-    df = pd.DataFrame(data=[v for k, v in dic.items() if k != 'Hour'], columns=dic['Hour'])
-    return df
+# def forecast_weather(locate: str, weather_api_key: str):
+#     download_json(locate, weather_api_key)
+#     dic = retrieve_processed_data()
+#     df = pd.DataFrame(data=[v for k, v in dic.items() if k != 'Hour'], columns=dic['Hour'])
+#     return df
 
 
 if __name__ == '__main__':
-    print(datetime.datetime.now())
-    print(forecast_weather(weather_api_key=WEATHER_API_KEY, locate='Новосибирск'))
-    print(datetime.datetime.now())
-    print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосибирск'))
+    # print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосибирск'))
+    print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосиб'))
     print(datetime.datetime.now())
