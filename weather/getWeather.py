@@ -93,6 +93,7 @@ def getWeatherForecast(locate: str, weather_api_key: str):
         f'Днем в среднем: {weather_res.json()["forecast"]["forecastday"][0]["day"]["avgtemp_c"]}°C ({weather_res.json()["forecast"]["forecastday"][0]["day"]["avgtemp_f"]}°F)'
     )
 
+
 def convert_parse_date_to_normal_date(date):
     months = {
         "января": '01',
@@ -115,26 +116,26 @@ def convert_parse_date_to_normal_date(date):
     return parts
 
 
-def download_json(locate: str, weather_api_key: str):
-    json_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={locate}&lang=ru&aqi=yes"
-    response = requests.get(json_url)
-    data = response.json()
-    with open("input.json", "w") as file:
-        json.dump(data["forecast"]["forecastday"][0]['hour'], file)
+# def download_json(locate: str, weather_api_key: str):
+#     json_url = f"http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={locate}&lang=ru&aqi=yes"
+#     response = requests.get(json_url)
+#     data = response.json()
+#     with open("input.json", "w") as file:
+#         json.dump(data["forecast"]["forecastday"][0]['hour'], file)
+#
+#
+# def retrieve_processed_data():
+#     subprocess.run(["go", "run", "parse_weather_api.go"])
+#     with open('output.json', 'r') as file:
+#         data = json.load(file)
+#     return data
 
 
-def retrieve_processed_data():
-    subprocess.run(["go", "run", "parse_weather_api.go"])
-    with open('output.json', 'r') as file:
-        data = json.load(file)
-    return data
-
-
-def forecast_weather(locate: str, weather_api_key: str):
-    download_json(locate, weather_api_key)
-    dic = retrieve_processed_data()
-    df = pd.DataFrame(data=[v for k, v in dic.items() if k != 'Hour'], columns=dic['Hour'])
-    return df
+# def forecast_weather(locate: str, weather_api_key: str):
+#     download_json(locate, weather_api_key)
+#     dic = retrieve_processed_data()
+#     df = pd.DataFrame(data=[v for k, v in dic.items() if k != 'Hour'], columns=dic['Hour'])
+#     return df
 
 
 if __name__ == '__main__':
