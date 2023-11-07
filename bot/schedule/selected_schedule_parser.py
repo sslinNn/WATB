@@ -64,12 +64,12 @@ def get_weekly_schedule_group(name):
 
         except Exception:
             pass
-        df = pd.DataFrame({'DAY': days,
-                           'LESSON': lessons,
-                           'TEACHER': teachers,
-                           'CAB': cabinet,
-                           'N': lesson_number,
-                           'TIME': retention_time})
+    df = pd.DataFrame({'DAY': days,
+                       'LESSON': lessons,
+                       'TEACHER': teachers,
+                       'CAB': cabinet,
+                       'N': lesson_number,
+                       'TIME': retention_time})
     return df
 
 
