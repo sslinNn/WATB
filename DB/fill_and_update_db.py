@@ -46,9 +46,47 @@ def insert_into_table():
     connection.commit()
     connection.close()
 
-    #     connection.execute(table.insert().values([{'subject_id': i}]))
-    # connection.commit()
-    # connection.close()
+
+def check_and_insert_teacher_subject():
+    table_name = 'teacher_subject'
+    engine = get_connetion_with_db()
+    connection = engine.connect()
+    metadata = db.MetaData()
+    subjects = parse_subject_teacher()
+    table = db.Table('teacher_subject', metadata, autoload_with=engine)
+    table_t = db.Table('teachers', metadata, autoload_with=engine)
+    table_s = db.Table('subjects', metadata, autoload_with=engine)
+    for teach, less in subjects.items():
+        select_stmt_s = db.select(table_s.c.id).where(table.c.title == less)
+        result_s = connection.execute(select_stmt_s)
+        row_s = result_s.fetchone()
+        select_stmt_t = db.select(table_t.c.id).where(table.c.title == teach)
+        result_t = connection.execute(select_stmt_t)
+        row_t = result_t.fetchone()
+        select_stmt = db.select(table).where(table.c.subject_id == row_s and table.c.teacher_id == row_t)
+        result = connection.execute(select_stmt)
+        row = result_s.fetchone()
+        if not row:
+            connection.execute(table.insert().values([{'subject_id': row_s, 'teacher_id': row_t}]))
+            connection.commit()
+        connection.close()
+
+
+def check_and_insert_subjects():
+    table_name = 'subjects'
+    engine = get_connetion_with_db()
+    connection = engine.connect()
+    metadata = db.MetaData()
+    subjects = parse_all_subjects()
+    table = db.Table(table_name, metadata, autoload_with=engine)
+    for s in subjects:
+        select_stmt = db.select(table).where(table.c.title == s)
+        result = connection.execute(select_stmt)
+        row = result.fetchone()
+        if not row:
+            connection.execute(table.insert().values([{'title': s}]))
+            connection.commit()
+        connection.close()
 
 
 def check_and_insert_teachers():
@@ -64,7 +102,6 @@ def check_and_insert_teachers():
         result = connection.execute(select_stmt)
         row = result.fetchone()
         if not row:
-            print(p)
             connection.execute(table.insert().values([{'name': p}]))
             connection.commit()
     connection.close()
