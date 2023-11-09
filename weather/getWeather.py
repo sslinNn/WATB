@@ -18,7 +18,7 @@ WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 
 
 def getWeather(locate: str, weather_api_key: str):
-    api_url_base = f'http://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={locate}&aqi=yes'
+    api_url_base = f'http://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={locate}&lang=ru&aqi=yes'
     weather_res = requests.get(url=api_url_base)
     condition = weather_res.json()["current"]["condition"]["text"]
     return (f'Местное время: {weather_res.json()["location"]["localtime"]} \n'
@@ -26,7 +26,7 @@ def getWeather(locate: str, weather_api_key: str):
             f'{weather_res.json()["current"]["temp_c"]}°C \n'
             f'Направление ветра: {wind_dir(weather_res.json()["current"]["wind_degree"])}\n'
             f'Ветер: {weather_res.json()["current"]["wind_kph"]} км/ч \n'
-            f'{trans(condition)}!!!\n'
+            f'{condition}!!!\n'
             f'Ощущается как: {round(feel_like(weather_res.json()["current"]["temp_c"], weather_res.json()["current"]["wind_kph"]))}°C (Посчитано вручную) \n'
             f'Ощущается как: {weather_res.json()["current"]["feelslike_c"]}°C (Дано в API) \n')
 
