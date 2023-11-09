@@ -5,6 +5,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv
 
+from bot.model.querys import insert_id_and_location_in_db
+
 from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName
 
 from bot.statements.states import StartWithUser, Menu
@@ -24,8 +26,8 @@ async def message_handler(message: types.Message, state: FSMContext):
     builder = ReplyKeyboardBuilder()
     builder.row(types.KeyboardButton(text='Да!'))
     await state.set_state(StartWithUser.yes)
-    # print(message.from_user.id)
     await message.answer(f'Привет! Хочешь узнать погоду?', reply_markup=builder.as_markup(resize_keyboard=True))
+
 
 
 
@@ -49,7 +51,7 @@ async def location(message: types.Message, state: FSMContext):
         await message.answer(f'Вы находитесь в: {userLocation}?', reply_markup=yesOrNo())
     elif message.text.lower() == 'ввести вручную':
         await state.set_state(StartWithUser.accepting)
-        await message.answer(f'Введите название вашего месторасположения')
+        await message.answer(f'Введите название вашего месторасположения', reply_markup=types.ReplyKeyboardRemove())
     else:
         await message.answer('Такого варианта ответа нет!')
 
@@ -67,6 +69,9 @@ async def accepting(message: types.Message, state: FSMContext):
                 text=f'Настройка бота готова, Добро Пожаловать!',
                 reply_markup=builder.as_markup(resize_keyboard=True)
             )
+            user_id = message.from_user.id
+            location_ = await state.get_data()
+            insert_id_and_location_in_db(user_id, location_.get('location'))
         elif message.text.lower() == 'нет':
             await state.set_state(StartWithUser.accepting)
             await message.answer(
@@ -75,10 +80,9 @@ async def accepting(message: types.Message, state: FSMContext):
             )
         elif message.text.lower() == 'ввести вручную':
             await state.set_state(StartWithUser.accepting)
-            await message.answer(text=f'Введите название вашего месторасположения')
+            await message.answer(text=f'Введите название вашего месторасположения', reply_markup=types.ReplyKeyboardRemove())
         else:
             await state.set_state(StartWithUser.accepting)
-
             city, country, fixed = getLocationFromCityName(TOKENYA, message.text.title())
             if fixed:
                 await state.update_data({'location': city})

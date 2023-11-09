@@ -9,8 +9,8 @@ from dotenv import load_dotenv
 
 from bot.statements.states import Menu, Secrets
 
-from schedule.selected_schedule_parser import get_daily_schedule, get_weekly_schedule_group
-from schedule.all_schedule_parser import getScheduleNHTK_groups
+from bot.schedule.selected_schedule_parser import get_daily_schedule, get_weekly_schedule_group
+from bot.schedule.all_schedule_parser import getScheduleNHTK_groups
 
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SecretKB import getNhtkKB, getScheduleKB
