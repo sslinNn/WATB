@@ -2,7 +2,8 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import time
-from schedule.all_schedule_parser import getScheduleNHTK_groups, getScheduleNHTK_teachers
+# from all_schedule_parser import getScheduleNHTK_groups, getScheduleNHTK_teachers
+from bot.schedule.all_schedule_parser import getScheduleNHTK_groups, getScheduleNHTK_teachers
 from datetime import datetime
 pd.options.mode.chained_assignment = None
 pd.set_option('display.max_columns', None)
@@ -138,6 +139,33 @@ def get_daily_schedule(name, date):
             return schedule
 
 
+def parse_all_subjects():
+    df = getScheduleNHTK_teachers()
+    iterator = 0
+    result = []
+    for i in df['Name']:
+        teacher_df = get_weekly_schedule_teacher(i)
+        for lesson in teacher_df['LESSON'].unique().tolist():
+            result.append(lesson)
+    return result
+
+
+def parse_subject_teacher():
+    df = getScheduleNHTK_teachers()
+    iterator = 0
+    result = {}
+    for i in df['Name']:
+        teacher_df = get_weekly_schedule_teacher(i)
+        lessons = teacher_df['LESSON'].unique().tolist()
+        k = 0
+        for lesson in lessons:
+            result[f'{i}/{k}'] = lesson
+            k += 1
+    return result
+
+
+
 if __name__ == '__main__':
-    # print(get_daily_schedule('Воробьев А. А.', '26.10.2023'))
-    print(get_weekly_schedule_group('09.07.10'))
+    print(datetime.now())
+    print(parse_subject_teacher())
+    print(datetime.now())

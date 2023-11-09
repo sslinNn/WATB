@@ -7,7 +7,8 @@ from reportlab.lib.fonts import addMapping
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import pandas as pd
-from schedule.table_styles import table_style
+from table_styles import table_style
+
 
 def df_to_png(df, output):
     new_df = weekday_division(df)
