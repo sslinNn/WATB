@@ -4,10 +4,9 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv
-
 from bot.model.querys import insert_id_and_location_in_db
-
-from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName
+import io
+from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName, get_location_photo
 
 from bot.statements.states import StartWithUser, Menu
 
@@ -17,6 +16,7 @@ from bot.keyboard.OtherKB import yesOrNo, locationKB
 load_dotenv()
 TOKEN = os.getenv('TGBOT_API_KEY')
 TOKENYA = os.getenv('YANDEX_API_KEY')
+TOKENYAMAP = os.getenv('YANDEX_API_KEY_MAP')
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -83,7 +83,7 @@ async def accepting(message: types.Message, state: FSMContext):
             await message.answer(text=f'Введите название вашего месторасположения', reply_markup=types.ReplyKeyboardRemove())
         else:
             await state.set_state(StartWithUser.accepting)
-            city, country, fixed = getLocationFromCityName(TOKENYA, message.text.title())
+            city, country, fixed, cords = getLocationFromCityName(TOKENYA, message.text.title())
             if fixed:
                 await state.update_data({'location': city})
                 await message.answer(
@@ -97,6 +97,10 @@ async def accepting(message: types.Message, state: FSMContext):
                     f'Вы находитесь в: {city}, страна {country}?',
                     reply_markup=yesOrNo()
                 )
+            photo_content = get_location_photo(TOKENYAMAP, lat=cords[0], long=cords[1])
+            await bot.send_photo(chat_id=message.chat.id, photo=types.input_file.BufferedInputFile(photo_content,
+                                                                                                   filename="map.png"))
+
 
     except AttributeError:
         await state.set_state(StartWithUser.accepting)
