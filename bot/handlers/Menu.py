@@ -37,7 +37,7 @@ async def menuPicker(message: types.Message, state: FSMContext):
         await message.answer(f'Вы тут: {data["location"]}', reply_markup=getSettingsKB())
         await state.set_state(Settings.location)
 
-    elif message.text.lower() == 'погода':
+    elif message.text.lower() == 'текущая погода':
         await state.set_state(StartWithUser.location)
         data = await state.get_data()
         try:
