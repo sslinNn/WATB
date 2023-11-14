@@ -114,7 +114,6 @@ def check_and_insert_groups():
     metadata = db.MetaData()
     df = getScheduleNHTK_groups()
     groups = list(df['GroupName'])
-    groups.append('66.66.66')
     table = db.Table(table_name, metadata, autoload_with=engine)
     for g in groups:
         select_stmt = db.select(table).where(table.c.title == g)
