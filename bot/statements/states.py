@@ -5,6 +5,7 @@ class StartWithUser(StatesGroup):
     yes = State()
     location = State()
     accepting = State()
+    numbers = State()
 
 
 class Menu(StatesGroup):
