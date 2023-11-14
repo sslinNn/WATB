@@ -29,8 +29,6 @@ async def message_handler(message: types.Message, state: FSMContext):
     await message.answer(f'Привет! Хочешь узнать погоду?', reply_markup=builder.as_markup(resize_keyboard=True))
 
 
-
-
 @dp.message(StartWithUser.yes)
 async def yes(message: types.Message, state: FSMContext):
     if message.text.lower() == 'да!':
@@ -71,7 +69,8 @@ async def accepting(message: types.Message, state: FSMContext):
             )
             user_id = message.from_user.id
             location_ = await state.get_data()
-            insert_id_and_location_in_db(user_id, location_.get('location'))
+            # print(f'Location: {location_["location"]} | UserID: {user_id}')
+            insert_id_and_location_in_db(user_id, location_['location'])
         elif message.text.lower() == 'нет':
             await state.set_state(StartWithUser.accepting)
             await message.answer(
@@ -80,7 +79,10 @@ async def accepting(message: types.Message, state: FSMContext):
             )
         elif message.text.lower() == 'ввести вручную':
             await state.set_state(StartWithUser.accepting)
-            await message.answer(text=f'Введите название вашего месторасположения', reply_markup=types.ReplyKeyboardRemove())
+            await message.answer(
+                text=f'Введите название вашего месторасположения',
+                reply_markup=types.ReplyKeyboardRemove()
+            )
         else:
             await state.set_state(StartWithUser.accepting)
             city, country, fixed = getLocationFromCityName(TOKENYA, message.text.title())
