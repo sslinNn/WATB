@@ -1,17 +1,24 @@
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
+import emoji
+
 
 def getNhtkKB():
     kb = ReplyKeyboardBuilder()
-    kb.button(text="Студент")
-    kb.button(text="Преподаватель")
-    kb.button(text="Меню")
+    student_e = emoji.emojize(":student:")
+    teacher_e = emoji.emojize(":teacher:")
+    menu_e = emoji.emojize("📋")
+    kb.button(text=f"Студент{student_e}")
+    kb.button(text=f"Преподаватель{teacher_e}")
+    kb.button(text=f"Меню{menu_e}")
     kb.adjust(2)
     return kb.as_markup(resize_keyboard=True)
 
 def getScheduleKB():
     kb = ReplyKeyboardBuilder()
-    kb.button(text="Расписание на завтра")
-    kb.button(text="Расписание на неделю")
-    kb.button(text="Меню")
+    menu_e = emoji.emojize("📋")
+    schedule_e = emoji.emojize(":spiral_notepad:")
+    kb.button(text=f"Меню{menu_e}")
+    kb.button(text=f"Расписание на завтра{schedule_e}")
+    kb.button(text=f"Расписание на неделю{schedule_e}")
     kb.adjust(2)
     return kb.as_markup(resize_keyboard=True)
