@@ -6,7 +6,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv
 from bot.model.querys import insert_id_and_location_in_db
 import io
-from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName, get_location_photo
+from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName, get_location_photo, get_location_from_city_name
 
 from bot.statements.states import StartWithUser, Menu
 
@@ -83,23 +83,31 @@ async def accepting(message: types.Message, state: FSMContext):
             await message.answer(text=f'Введите название вашего месторасположения', reply_markup=types.ReplyKeyboardRemove())
         else:
             await state.set_state(StartWithUser.accepting)
-            city, country, fixed, cords = getLocationFromCityName(TOKENYA, message.text.title())
-            if fixed:
+            city = message.text.title()
+            builder = ReplyKeyboardBuilder()
+            locations, cords = get_location_from_city_name(TOKENYA, city)
+            if len(locations) > 1:
+                await state.set_state(StartWithUser.numbers)
                 await state.update_data({'location': city})
-                await message.answer(
-                    f'Кажется вы неправильно ввели город: {message.text.title()}, '
-                    f'вы находитесь в: {city}, страна {country}?',
-                    reply_markup=yesOrNo()
-                )
+                output = ''
+                for i in range(len(locations)):
+                    output += f'{i+1}. ' + locations[i] + '\n'
+                    builder.add(types.KeyboardButton(text=str(i+1)))
+                builder.row(types.KeyboardButton(text='Отправить геопозицию'))
+                builder.adjust(2)
+                output += '\nЕсли в списке нет вашего местоположения, пожалуйста, отправьте геопозицию'
+                await message.answer(text=f'Найдено несколько совпадений, выберете номер:\n'
+                                          f'{output}',
+                                     reply_markup=builder.as_markup(resize_keyboard=True))
             else:
                 await state.update_data({'location': city})
                 await message.answer(
-                    f'Вы находитесь в: {city}, страна {country}?',
+                    f'Вы находитесь в: {locations[0]}?',
                     reply_markup=yesOrNo()
                 )
-            photo_content = get_location_photo(TOKENYAMAP, lat=cords[0], long=cords[1])
-            await bot.send_photo(chat_id=message.chat.id, photo=types.input_file.BufferedInputFile(photo_content,
-                                                                                                   filename="map.png"))
+                photo_content = get_location_photo(TOKENYAMAP, lat=cords[0][0], long=cords[0][1])
+                await bot.send_photo(chat_id=message.chat.id, photo=types.input_file.BufferedInputFile(photo_content,
+                                                                                                       filename="map.png"))
 
 
     except AttributeError:
@@ -111,3 +119,22 @@ async def accepting(message: types.Message, state: FSMContext):
         await message.answer(
             f'Вы находитесь в: {userLocation}?', reply_markup=yesOrNo()
         )
+
+
+@dp.message(StartWithUser.numbers)
+async def location_by_number(message: types.Message, state: FSMContext):
+    if 0 < int(message.text) < 11:
+        await state.set_state(StartWithUser.location)
+        data = await state.get_data()
+        city = data['location']
+        await state.set_state(StartWithUser.accepting)
+        locations, cords = get_location_from_city_name(TOKENYA, city)
+        await state.update_data({'location': locations[int(message.text)-1]})
+        await message.answer(
+            f'Вы находитесь в: {locations[int(message.text)-1]}?',
+            reply_markup=yesOrNo()
+        )
+        photo_content = get_location_photo(TOKENYAMAP, lat=cords[int(message.text)-1][0],
+                                           long=cords[int(message.text)-1][1])
+        await bot.send_photo(chat_id=message.chat.id, photo=types.input_file.BufferedInputFile(photo_content,
+                                                                                               filename="map.png"))
