@@ -21,19 +21,33 @@ def getLocationFromCityName(TOKEN: str, NAME: str):
     api_url_base = f'https://geocode-maps.yandex.ru/1.x/?apikey={TOKEN}&geocode={NAME}&format=json'
     response = requests.get(url=api_url_base).text
     location_res = json.loads(response)
+    coincidences = [i['GeoObject']['metaDataProperty']['GeocoderMetaData']['text'] for i in location_res['response']['GeoObjectCollection']['featureMember']]
     cords = location_res['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split(' ')
     geo = location_res['response']['GeoObjectCollection']['metaDataProperty']['GeocoderResponseMetaData']
     suggest = geo.get('suggest', None)
     country_name = location_res['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
         'GeocoderMetaData']['Address']['Components'][0]['name']
     if suggest:
-        return re.sub(r'<[^>]+>', '', suggest).title(), country_name, True, cords
+        return re.sub(r'<[^>]+>', '', suggest).title(), country_name, True, cords, coincidences
     else:
-        return geo['request'].title(), country_name, False, cords
+        return geo['request'].title(), country_name, False, cords, coincidences
+
+
+def get_location_from_city_name(TOKEN: str, NAME: str):
+    api_url_base = f'https://geocode-maps.yandex.ru/1.x/?apikey={TOKEN}&geocode={NAME}&kind=locality&format=json'
+    response = requests.get(url=api_url_base).text
+    location_res = json.loads(response)
+    coincidences = [i['GeoObject']['metaDataProperty']['GeocoderMetaData']['text'] for i in
+                    location_res['response']['GeoObjectCollection']['featureMember']
+                    if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'locality']
+    cords = [i['GeoObject']['Point']['pos'].split(' ') for i in
+             location_res['response']['GeoObjectCollection']['featureMember']
+             if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'locality']
+    return coincidences, cords
 
 
 def get_location_photo(token: str, lat, long):
-    api_url = (f'https://static-maps.yandex.ru/v1?lang=ru_RU&ll={lat},{long}&spn=0.3,0.3&apikey={token}')
+    api_url = (f'https://static-maps.yandex.ru/v1?lang=ru_RU&ll={lat},{long}&spn=0.5,0.5&apikey={token}')
     response = requests.get(url=api_url).content
     return response
 
@@ -42,4 +56,6 @@ def get_location_photo(token: str, lat, long):
 
 
 if __name__ == '__main__':
-    print(getLocationFromCityName(TOKEN, 'Новосибирск'))
+    a, b = get_location_from_city_name(TOKEN, 'Зея')
+    print(a)
+    print(b)
