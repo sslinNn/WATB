@@ -27,8 +27,7 @@ def getWeather(locate: str, weather_api_key: str):
             f'Направление ветра: {wind_dir(weather_res.json()["current"]["wind_degree"])}\n'
             f'Ветер: {weather_res.json()["current"]["wind_kph"]} км/ч \n'
             f'{condition}!!!\n'
-            f'Ощущается как: {round(feel_like(weather_res.json()["current"]["temp_c"], weather_res.json()["current"]["wind_kph"]))}°C (Посчитано вручную) \n'
-            f'Ощущается как: {weather_res.json()["current"]["feelslike_c"]}°C (Дано в API) \n')
+            f'Ощущается как: {weather_res.json()["current"]["feelslike_c"]}°C\n')
 
 
 def wind_dir(wind):
