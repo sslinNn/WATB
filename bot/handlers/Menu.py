@@ -4,8 +4,8 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
 
-from weather.getWeather import getWeather
-
+from weather.getWeather import getWeather, parse_api
+from weather.graphs import weather_graph
 from bot.statements.states import StartWithUser, Menu, Settings, Secrets
 
 from bot.keyboard.MenuKB import getMenuKB
@@ -42,6 +42,19 @@ async def menuPicker(message: types.Message, state: FSMContext):
         data = await state.get_data()
         try:
             await message.answer(text=f'{getWeather(locate=data["location"], weather_api_key=WEATHER_API_KEY)}')
+            await state.set_state(Menu.menuPicker)
+        except Exception as ex:
+            logging.exception(ex)
+            await message.answer(text='Я не знаю где вы находитесь!')
+    elif message.text.lower() == 'прогноз погоды на сегодня':
+        try:
+            await state.set_state(StartWithUser.location)
+            data = await state.get_data()
+            wait = await bot.send_message(chat_id=message.chat.id, text='Подождите...')
+            df, sun, date = parse_api(data['location'], WEATHER_API_KEY)
+            photo_content = weather_graph(df, sun, date, data['location'])
+            await bot.delete_message(chat_id=message.chat.id, message_id=wait.message_id)
+            await bot.send_photo(chat_id=message.chat.id, photo=types.input_file.BufferedInputFile(photo_content, filename="weather.png"))
             await state.set_state(Menu.menuPicker)
         except Exception as ex:
             logging.exception(ex)
