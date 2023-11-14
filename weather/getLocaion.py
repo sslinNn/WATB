@@ -39,10 +39,10 @@ def get_location_from_city_name(TOKEN: str, NAME: str):
     location_res = json.loads(response)
     coincidences = [i['GeoObject']['metaDataProperty']['GeocoderMetaData']['text'] for i in
                     location_res['response']['GeoObjectCollection']['featureMember']
-                    if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'locality']
+                    if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] != 'hydro']
     cords = [i['GeoObject']['Point']['pos'].split(' ') for i in
              location_res['response']['GeoObjectCollection']['featureMember']
-             if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] == 'locality']
+             if i['GeoObject']['metaDataProperty']['GeocoderMetaData']['kind'] != 'hydro']
     return coincidences, cords
 
 
@@ -56,6 +56,6 @@ def get_location_photo(token: str, lat, long):
 
 
 if __name__ == '__main__':
-    a, b = get_location_from_city_name(TOKEN, 'Зея')
+    a, b = get_location_from_city_name(TOKEN, 'Москва')
     print(a)
     print(b)
