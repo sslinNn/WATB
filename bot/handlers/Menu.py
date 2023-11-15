@@ -3,7 +3,7 @@ import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
-
+from bot.keyboard.emoji_control import remove_emojis
 from weather.getWeather import getWeather, parse_api
 from weather.graphs import weather_graph
 from bot.statements.states import StartWithUser, Menu, Settings, Secrets
@@ -31,13 +31,13 @@ async def menu(message: types.Message, state: FSMContext):
 
 @dp.message(Menu.menuPicker)
 async def menuPicker(message: types.Message, state: FSMContext):
-    if message.text.lower() == 'настройки':
+    if remove_emojis(message.text.lower()) == 'настройки':
         await state.set_state(Settings.location)
         data = await state.get_data()
         await message.answer(f'Вы тут: {data["location"]}', reply_markup=getSettingsKB())
         await state.set_state(Settings.location)
 
-    elif message.text.lower() == 'текущая погода':
+    elif remove_emojis(message.text.lower()) == 'текущая погода':
         await state.set_state(StartWithUser.location)
         data = await state.get_data()
         try:
@@ -46,7 +46,7 @@ async def menuPicker(message: types.Message, state: FSMContext):
         except Exception as ex:
             logging.exception(ex)
             await message.answer(text='Я не знаю где вы находитесь!')
-    elif message.text.lower() == 'прогноз погоды на сегодня':
+    elif remove_emojis(message.text.lower()) == 'прогноз погоды на сегодня':
         try:
             await state.set_state(StartWithUser.location)
             data = await state.get_data()
@@ -59,7 +59,7 @@ async def menuPicker(message: types.Message, state: FSMContext):
         except Exception as ex:
             logging.exception(ex)
             await message.answer(text='Я не знаю где вы находитесь!')
-    elif message.text.lower() == 'ввести секретный код':
+    elif remove_emojis(message.text.lower()) == 'ввести секретный код':
         await state.set_state(Secrets.code)
         await message.answer('Введите секретный код!', reply_markup=types.ReplyKeyboardRemove())
     else:

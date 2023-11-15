@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from bot.model.querys import insert_id_and_location_in_db
 import io
 from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName, get_location_photo, get_location_from_city_name
-
+from bot.keyboard.emoji_control import remove_emojis
 from bot.statements.states import StartWithUser, Menu
 
 from bot.keyboard.OtherKB import yesOrNo, locationKB
@@ -49,7 +49,7 @@ async def location(message: types.Message, state: FSMContext):
         userLocation = getLocationFromCoordinates(TOKEN=TOKENYA, longitude=lon, latitude=lat)
         await state.update_data({'location': userLocation})
         await message.answer(f'Вы находитесь в: {userLocation}?', reply_markup=yesOrNo())
-    elif message.text.lower() == 'ввести вручную':
+    elif remove_emojis(message.text.lower()) == 'ввести вручную':
         await state.set_state(StartWithUser.accepting)
         await message.answer(f'Введите название вашего месторасположения', reply_markup=types.ReplyKeyboardRemove())
     else:
@@ -59,7 +59,7 @@ async def location(message: types.Message, state: FSMContext):
 @dp.message(StartWithUser.accepting)
 async def accepting(message: types.Message, state: FSMContext):
     try:
-        if message.text.lower() == 'да':
+        if remove_emojis(message.text.lower()) == 'да':
             await state.set_state(Menu.menu)
             builder = ReplyKeyboardBuilder()
             builder.row(
@@ -72,13 +72,13 @@ async def accepting(message: types.Message, state: FSMContext):
             user_id = message.from_user.id
             location_ = await state.get_data()
             insert_id_and_location_in_db(user_id, location_.get('location'))
-        elif message.text.lower() == 'нет':
+        elif remove_emojis(message.text.lower()) == 'нет':
             await state.set_state(StartWithUser.accepting)
             await message.answer(
                 text=f'Попробуйте снова, или введите название вашего месторасположения вручную',
                 reply_markup=locationKB()
             )
-        elif message.text.lower() == 'ввести вручную':
+        elif remove_emojis(message.text.lower()) == 'ввести вручную':
             await state.set_state(StartWithUser.accepting)
             await message.answer(text=f'Введите название вашего месторасположения', reply_markup=types.ReplyKeyboardRemove())
         else:

@@ -6,7 +6,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
 from dotenv import load_dotenv
-
+from bot.keyboard.emoji_control import remove_emojis
 from bot.statements.states import Menu, Secrets
 
 from bot.schedule.selected_schedule_parser import get_daily_schedule, get_weekly_schedule_group
@@ -35,7 +35,7 @@ async def code(message: types.Message, state: FSMContext):
         await message.answer('Такого кода нет!')
 
 async def nhtk(message: types.Message, state: FSMContext):
-    if message.text.lower() == 'студент':
+    if remove_emojis(message.text.lower()) == 'студент':
         # await state.clear()
         await state.set_state(Secrets.nhtkGroup)
         df = getScheduleNHTK_groups()
@@ -50,14 +50,14 @@ async def nhtk(message: types.Message, state: FSMContext):
             "Выберите группу из списка или введите вручную",
             reply_markup=builder.as_markup(resize_keyboard=True),
         )
-    elif message.text.lower() == 'преподаватель':
+    elif remove_emojis(message.text.lower()) == 'преподаватель':
         builder = ReplyKeyboardBuilder()
         builder.row(types.KeyboardButton(text='Меню'))  # Отдельная строка для "В меню"
         await message.answer(
             "Увы, кнопок нет, но вы можете ввести свою фамилию (например: Иванов. И. И.)",
             reply_markup=builder.as_markup(resize_keyboard=True),
         )
-    elif message.text.lower() == 'меню':
+    elif remove_emojis(message.text.lower()) == 'меню':
         await state.set_state(Menu.menuPicker)
         await message.answer('Меню: ', reply_markup=getMenuKB())
     else:
@@ -76,7 +76,7 @@ async def nhtkGroup(message: types.Message, state: FSMContext):
             f'Что хотите узнать?',
             reply_markup=getScheduleKB()
         )
-    elif message.text.lower() == 'меню':
+    elif remove_emojis(message.text.lower()) == 'меню':
         await state.set_state(Menu.menuPicker)
         await message.answer('Меню: ', reply_markup=getMenuKB())
     else:
@@ -85,7 +85,7 @@ async def nhtkGroup(message: types.Message, state: FSMContext):
 
 
 async def schedulePicker(message: types.Message, state: FSMContext):
-    if message.text.lower() == 'расписание на завтра':
+    if remove_emojis(message.text.lower()) == 'расписание на завтра':
         await state.set_state(Secrets.schedulePicker)
         group = await state.get_data()
         builder = ReplyKeyboardBuilder()
@@ -98,7 +98,7 @@ async def schedulePicker(message: types.Message, state: FSMContext):
         # print(df_str)
         photo = FSInputFile('schedule/output/1.png')
         await bot.send_photo(chat_id=message.chat.id, photo=photo)
-    elif message.text.lower() == 'расписание на неделю':
+    elif remove_emojis(message.text.lower()) == 'расписание на неделю':
         builder = ReplyKeyboardBuilder()
         builder.row(types.KeyboardButton(text='Меню'))
         await state.set_state(Secrets.schedulePicker)
@@ -108,7 +108,7 @@ async def schedulePicker(message: types.Message, state: FSMContext):
         # print(df_str)
         photo = FSInputFile('schedule/output/1.png')
         await bot.send_photo(chat_id=message.chat.id, photo=photo)
-    elif message.text.lower() == 'меню':
+    elif remove_emojis(message.text.lower()) == 'меню':
         await state.set_state(Menu.menuPicker)
         await message.answer('Меню: ', reply_markup=getMenuKB())
     else:
