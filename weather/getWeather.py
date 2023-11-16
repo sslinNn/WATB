@@ -27,8 +27,7 @@ def getWeather(locate: str, weather_api_key: str):
             f'Направление ветра: {wind_dir(weather_res.json()["current"]["wind_degree"])}\n'
             f'Ветер: {weather_res.json()["current"]["wind_kph"]} км/ч \n'
             f'{condition}!!!\n'
-            f'Ощущается как: {round(feel_like(weather_res.json()["current"]["temp_c"], weather_res.json()["current"]["wind_kph"]))}°C (Посчитано вручную) \n'
-            f'Ощущается как: {weather_res.json()["current"]["feelslike_c"]}°C (Дано в API) \n')
+            f'Ощущается как: {weather_res.json()["current"]["feelslike_c"]}°C\n')
 
 
 def wind_dir(wind):
@@ -66,6 +65,9 @@ def parse_api(locate: str, weather_api_key: str):
     api_url_forecast = f'http://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={locate}&lang=ru&aqi=yes'
     weather_res = requests.get(url=api_url_forecast)
     date = convert_parse_date_to_normal_date(weather_res.json()["forecast"]["forecastday"][0]['date'])
+    print(date)
+    for i in weather_res.json()["forecast"]["forecastday"]:
+        print(i)
     per_hour = weather_res.json()["forecast"]["forecastday"][0]['hour']
     hour = []
     temp_c = []
@@ -81,7 +83,7 @@ def parse_api(locate: str, weather_api_key: str):
         pass
     df = pd.DataFrame({'Hour': hour, 'Temp_C': temp_c, 'Condition': condition, 'Wind': wind, 'Icon': img_condition})
     df = df.set_index('Hour').T
-    return df, [weather_res.json()["forecast"]["forecastday"][0]['astro']['sunrise'], weather_res.json()["forecast"]["forecastday"][0]['astro']['sunset']]
+    return df, [weather_res.json()["forecast"]["forecastday"][0]['astro']['sunrise'], weather_res.json()["forecast"]["forecastday"][0]['astro']['sunset']], date
 
 
 def getWeatherForecast(locate: str, weather_api_key: str):
@@ -139,6 +141,8 @@ def convert_parse_date_to_normal_date(date):
 
 
 if __name__ == '__main__':
+    print(parse_api('Казахстан, Костанайская область, Фёдоровский район, село Первомайское',
+                             weather_api_key=WEATHER_API_KEY))
     # print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосибирск'))
     print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосиб'))
     print(datetime.datetime.now())
