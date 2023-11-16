@@ -33,8 +33,10 @@ async def message_handler(message: types.Message, state: FSMContext):
 async def yes(message: types.Message, state: FSMContext):
     if message.text.lower() == 'да!':
         await state.set_state(StartWithUser.location)
-        await message.answer('Тогда поделись со мной своей геолокацией, пожалуйста!',
-                             reply_markup=locationKB())
+        await message.answer(
+            'Тогда поделись со мной своей геолокацией, пожалуйста!',
+            reply_markup=locationKB()
+        )
     else:
         await message.answer('Я не понимаю, о чем ты')
 
@@ -99,7 +101,6 @@ async def accepting(message: types.Message, state: FSMContext):
                     f'Вы находитесь в: {city}, страна {country}?',
                     reply_markup=yesOrNo()
                 )
-
     except AttributeError:
         await state.set_state(StartWithUser.accepting)
         lon = message.location.longitude

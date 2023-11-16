@@ -1,5 +1,4 @@
 import os
-import pymysql.cursors
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
