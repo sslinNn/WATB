@@ -8,7 +8,7 @@ from aiogram.types import FSInputFile
 from dotenv import load_dotenv
 from bot.keyboard.emoji_control import remove_emojis
 from bot.statements.states import Menu, Secrets
-
+from bot.schedule.converting_df_bez_xyini import df_to_png
 from bot.schedule.selected_schedule_parser import get_daily_schedule, get_weekly_schedule_group
 from bot.schedule.all_schedule_parser import getScheduleNHTK_groups
 
@@ -94,20 +94,18 @@ async def schedulePicker(message: types.Message, state: FSMContext):
         tomorrow = today + datetime.timedelta(days=1)
         tomorrow_new = '.'.join(str(tomorrow).split('-')[::-1])
         df = get_daily_schedule(group["group"], tomorrow_new)
-        df_str = df.to_string(index=False)
-        # print(df_str)
-        photo = FSInputFile('schedule/output/1.png')
-        await bot.send_photo(chat_id=message.chat.id, photo=photo)
+        photo = df_to_png(df)
+        await bot.send_photo(chat_id=message.chat.id,
+                             photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
     elif remove_emojis(message.text.lower()) == 'расписание на неделю':
         builder = ReplyKeyboardBuilder()
         builder.row(types.KeyboardButton(text='Меню'))
         await state.set_state(Secrets.schedulePicker)
         group = await state.get_data()
         df = get_weekly_schedule_group(group["group"])
-        df_str = df.to_string(index=False)
-        # print(df_str)
-        photo = FSInputFile('schedule/output/1.png')
-        await bot.send_photo(chat_id=message.chat.id, photo=photo)
+        photo = df_to_png(df)
+        await bot.send_photo(chat_id=message.chat.id,
+                             photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
     elif remove_emojis(message.text.lower()) == 'меню':
         await state.set_state(Menu.menuPicker)
         await message.answer('Меню: ', reply_markup=getMenuKB())
