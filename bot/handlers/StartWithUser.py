@@ -29,14 +29,14 @@ async def message_handler(message: types.Message, state: FSMContext):
     await message.answer(f'Привет! Хочешь узнать погоду?', reply_markup=builder.as_markup(resize_keyboard=True))
 
 
-
-
 @dp.message(StartWithUser.yes)
 async def yes(message: types.Message, state: FSMContext):
     if message.text.lower() == 'да!':
         await state.set_state(StartWithUser.location)
-        await message.answer('Тогда поделись со мной своей геолокацией, пожалуйста!',
-                             reply_markup=locationKB())
+        await message.answer(
+            'Тогда поделись со мной своей геолокацией, пожалуйста!',
+            reply_markup=locationKB()
+        )
     else:
         await message.answer('Я не понимаю, о чем ты')
 
@@ -80,7 +80,10 @@ async def accepting(message: types.Message, state: FSMContext):
             )
         elif remove_emojis(message.text.lower()) == 'ввести вручную':
             await state.set_state(StartWithUser.accepting)
-            await message.answer(text=f'Введите название вашего месторасположения', reply_markup=types.ReplyKeyboardRemove())
+            await message.answer(
+                text=f'Введите название вашего месторасположения',
+                reply_markup=types.ReplyKeyboardRemove()
+            )
         else:
             await state.set_state(StartWithUser.accepting)
             city = message.text.title()
@@ -108,7 +111,6 @@ async def accepting(message: types.Message, state: FSMContext):
                 photo_content = get_location_photo(TOKENYAMAP, lat=cords[0][0], long=cords[0][1])
                 await bot.send_photo(chat_id=message.chat.id,
                                      photo=types.input_file.BufferedInputFile(photo_content, filename="map.png"))
-
 
     except AttributeError:
         await state.set_state(StartWithUser.accepting)

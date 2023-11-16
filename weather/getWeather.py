@@ -5,13 +5,13 @@ import requests
 from dotenv import load_dotenv
 from translate import Translator
 import datetime
+
+
 pd.options.mode.chained_assignment = None
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', None)
-import json
-
 
 load_dotenv()
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
@@ -143,3 +143,6 @@ def convert_parse_date_to_normal_date(date):
 if __name__ == '__main__':
     print(parse_api('Казахстан, Костанайская область, Фёдоровский район, село Первомайское',
                              weather_api_key=WEATHER_API_KEY))
+    # print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосибирск'))
+    print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосиб'))
+    print(datetime.datetime.now())

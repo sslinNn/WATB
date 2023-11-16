@@ -11,6 +11,8 @@ from bot.statements.states import StartWithUser, Menu, Settings, Secrets
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
 
+from bot.model.querys import select_location_from_db
+
 
 load_dotenv()
 TOKEN = os.getenv('TGBOT_API_KEY')
@@ -33,10 +35,11 @@ async def menu(message: types.Message, state: FSMContext):
 async def menuPicker(message: types.Message, state: FSMContext):
     if remove_emojis(message.text.lower()) == 'настройки':
         await state.set_state(Settings.location)
-        data = await state.get_data()
-        await message.answer(f'Вы тут: {data["location"]}', reply_markup=getSettingsKB())
+        # location = await state.get_data()
+        # await message.answer(f'Вы тут: {location["location"]}', reply_markup=getSettingsKB())
+        location = select_location_from_db(id_=message.from_user.id)
+        await message.answer(f'Вы тут: {location}', reply_markup=getSettingsKB())
         await state.set_state(Settings.location)
-
     elif remove_emojis(message.text.lower()) == 'текущая погода':
         await state.set_state(StartWithUser.location)
         data = await state.get_data()
