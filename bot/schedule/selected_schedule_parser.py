@@ -38,7 +38,8 @@ def convert_parse_date_to_normal_date(date):
 def get_weekly_schedule_group(name):
     df = getScheduleNHTK_groups()
     link = df[df['GroupName'] == name][['GroupLink']].values[0]
-    response = requests.get(link[0])
+    requests.packages.urllib3.disable_warnings()
+    response = requests.get(link[0], verify=False)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'lxml')
     schedule = soup.find('table', class_='расписание')
@@ -78,7 +79,8 @@ def get_weekly_schedule_teacher(name):
     df = getScheduleNHTK_teachers()
     link = df[df['Name'] == name][[
         'Link']].values[0]
-    response = requests.get(link[0])
+    requests.packages.urllib3.disable_warnings()
+    response = requests.get(link[0], verify=False)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'lxml')
     schedule = soup.find('table', class_='расписание')

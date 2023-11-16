@@ -2,14 +2,14 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import pandas as pd
-from getWeather import parse_api
+from weather.getWeather import parse_api
 from dotenv import load_dotenv
 import os
 import requests
 from io import BytesIO
 
 
-def weather_graph(df, sun):
+def weather_graph(df, sun, date, locate):
     hours = [i for i in df]
     new_df = pd.DataFrame({
         'HOUR': hours,
@@ -32,7 +32,8 @@ def weather_graph(df, sun):
     x = new_df['HOUR']
     y = new_df['TEMP_C']
     ax.plot(x, y, marker='o', linestyle='-', color='b')
-    ax.set_title(f'{locate}')
+    ax.set_title(f'{locate}\n'
+                 f'{" ".join(date[::-1])}')
     daylight_x = []
     daylight_y = []
 
@@ -60,19 +61,22 @@ def weather_graph(df, sun):
     ax.set_xticks(range(len(x)))
     ax.set_xticklabels(x, rotation=45)
     ax.set_ylim(min(y) - 3, max(y) + 2)
-    ax.set_xlabel('Время')
+    ax.set_xlabel('Время (местное)')
     ax.set_ylabel('Температура (°C)')
     plt.tight_layout()
-    plt.savefig('output/weather_graph.png')
-
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()
+    return buffer.getvalue()
 
 
 if __name__ == '__main__':
     load_dotenv()
     WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
-    locate = 'Пхукет'
-    df, sun = parse_api(locate, WEATHER_API_KEY)
-    weather_graph(df, sun)
+    locate = 'Казахстан, Костанайская область, Фёдоровский район, село Первомайское'
+    df, sun, date = parse_api(locate, WEATHER_API_KEY)
+    weather_graph(df, sun, date, locate)
 
 
 

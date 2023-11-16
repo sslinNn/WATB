@@ -8,7 +8,7 @@ from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 from statements.states import StartWithUser, Menu, Settings, Secrets
 
-from handlers.StartWithUser import message_handler, yes, location, accepting
+from handlers.StartWithUser import message_handler, yes, location, accepting, location_by_number
 from handlers.Menu import menu, menuPicker
 from handlers.Settings import changeLocate
 from handlers.Secrets import code, nhtk, nhtkGroup, schedulePicker
@@ -35,6 +35,7 @@ async def main():
     dp.message.register(nhtk, Secrets.nhtk)
     dp.message.register(nhtkGroup, Secrets.nhtkGroup)
     dp.message.register(schedulePicker, Secrets.schedulePicker)
+    dp.message.register(location_by_number, StartWithUser.numbers)
     await dp.start_polling(bott)
 
 

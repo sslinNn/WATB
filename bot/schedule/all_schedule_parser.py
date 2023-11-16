@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from urllib3.exceptions import InsecureRequestWarning
 pd.options.mode.chained_assignment = None
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
@@ -10,7 +11,8 @@ pd.set_option('display.max_colwidth', None)
 
 def getScheduleNHTK_groups():
     url = 'https://расписание.нхтк.рф/группы.html#заголовок'
-    response = requests.get(url)
+    requests.packages.urllib3.disable_warnings()
+    response = requests.get(url, verify=False)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'lxml')
     group_columns = soup.find_all('a')
@@ -24,7 +26,8 @@ def getScheduleNHTK_groups():
 
 def getScheduleNHTK_teachers():
     url = 'https://расписание.нхтк.рф/преподаватели.html#заголовок'
-    response = requests.get(url)
+    requests.packages.urllib3.disable_warnings()
+    response = requests.get(url, verify=False)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'lxml')
     group_columns = soup.find_all('a')
@@ -41,5 +44,5 @@ def getScheduleNHTK_teachers():
 
 
 
-# if __name__ == '__main__':
-#     NHTK_lesson_number_parser()
+if __name__ == '__main__':
+    print(getScheduleNHTK_groups())
