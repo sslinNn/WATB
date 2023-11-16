@@ -6,7 +6,7 @@ from typing import Any
 
 import pandas as pd
 import plotly
-
+import io
 plotly.io.kaleido.scope.mathjax = None
 
 
@@ -106,3 +106,11 @@ def save_dataframe(fig: plotly.graph_objects.Figure, filename: Path) -> None:
     fig.write_image(filename)
 
     return None
+
+
+def save_dataframe_byte(fig: plotly.graph_objects.Figure):
+    buffer = io.BytesIO()
+    fig.write_image(buffer, format="png")
+    buffer.seek(0)
+    png_bytes = buffer.read()
+    return png_bytes
