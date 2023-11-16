@@ -106,8 +106,8 @@ async def accepting(message: types.Message, state: FSMContext):
                     reply_markup=yesOrNo()
                 )
                 photo_content = get_location_photo(TOKENYAMAP, lat=cords[0][0], long=cords[0][1])
-                await bot.send_photo(chat_id=message.chat.id, photo=types.input_file.BufferedInputFile(photo_content,
-                                                                                                       filename="map.png"))
+                await bot.send_photo(chat_id=message.chat.id,
+                                     photo=types.input_file.BufferedInputFile(photo_content, filename="map.png"))
 
 
     except AttributeError:
