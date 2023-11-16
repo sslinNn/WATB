@@ -5,13 +5,13 @@ import requests
 from dotenv import load_dotenv
 from translate import Translator
 import datetime
+
+
 pd.options.mode.chained_assignment = None
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', None)
-import json
-
 
 load_dotenv()
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
