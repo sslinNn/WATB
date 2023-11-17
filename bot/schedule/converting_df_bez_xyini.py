@@ -14,10 +14,11 @@ from IPython.display import display, Image
 from datetime import datetime
 
 
-def df_to_png(df):
+def df_to_png(df, byte: bool = False):
     new_df = weekday_division(df)
-    new_df = add_weekday_to_df(new_df)
-    row_count = len(new_df)
+    new_df, bold = add_weekday_to_df(new_df)
+    print(bold)
+    row_count = len(new_df) + (bold.count(True) / 2)
     row_size = 21.25
     if row_count < 7:
         row_count += 2
@@ -26,10 +27,14 @@ def df_to_png(df):
     fig = plot_dataframe(new_df, print_index=False,
                                 fig_size=(1050, wigth),
                                 col_width=[100, 600, 150, 50, 50, 100],
-                         row_fill_colors=colors)
-
-    byte = save_dataframe_byte(fig)
-    return byte
+                         row_fill_colors=colors,
+                         text_thickness=12,
+                         bold_rows=bold)
+    if byte:
+        byte_ = save_dataframe_byte(fig)
+        return byte_
+    else:
+        photo = save_dataframe(fig, 'output/1.png')
 
 
 def weekday_division(df):
@@ -49,10 +54,14 @@ def weekday_by_date(date):
 
 
 def add_weekday_to_df(df):
+    bold = []
     for i in range(len(df['DAY'])):
         if df['DAY'].loc[i] == '':
             df['DAY'].loc[i] = weekday_by_date(df['DAY'].loc[i+1])
-    return df
+            bold.append(True)
+        else:
+            bold.append(False)
+    return df, bold
 
 
 
