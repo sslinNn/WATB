@@ -83,7 +83,7 @@ async def nhtkGroup(message: types.Message, state: FSMContext):
         await message.answer('ЧТо?')
 
 
-
+# Тут чет дохуя ненужных строк... Их удалить верное можно? (PEP-8 BRATIK)
 async def schedulePicker(message: types.Message, state: FSMContext):
     if remove_emojis(message.text.lower()) == 'расписание на завтра':
         await state.set_state(Secrets.schedulePicker)
