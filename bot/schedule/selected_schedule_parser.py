@@ -125,6 +125,7 @@ def get_daily_schedule(name, date):
         schedule = df[df['DAY'] == date][[
             'DAY',
             'LESSON',
+            'TEACHER',
             'CAB',
             'N',
             'TIME']]#.to_numpy()

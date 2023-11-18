@@ -6,7 +6,7 @@ from typing import Any
 
 import pandas as pd
 import plotly
-
+import io
 plotly.io.kaleido.scope.mathjax = None
 
 
@@ -19,6 +19,8 @@ def plot_dataframe(
     tbl_cells: dict | None = None,
     row_fill_colors: list[str] | None = None,
     col_width: int | float | list[int | float] | None = None,
+    text_thickness: int | list[int] | None = None,
+    bold_rows: list[bool] | None = None,
     fig_size: tuple[int, int] | None = None,
     show_fig: bool = True,
     plotly_renderer: str = "png",
@@ -60,9 +62,12 @@ def plot_dataframe(
         tbl_header.update(
             fill_color="white", font_color="white", line_color="white", height=1
         )
-
     if not tbl_cells:
         tbl_cells = {}
+
+    if bold_rows:
+        cell_vals = [[f"<b>{val}</b>" if bold else val for val, bold in zip(row, bold_rows)] for row in cell_vals]
+
     tbl_cells.update(
         values=cell_vals,
         fill_color=[row_fill_colors] * len(df) if row_fill_colors else tbl_cells.get("fill_color"),
@@ -106,3 +111,11 @@ def save_dataframe(fig: plotly.graph_objects.Figure, filename: Path) -> None:
     fig.write_image(filename)
 
     return None
+
+
+def save_dataframe_byte(fig: plotly.graph_objects.Figure):
+    buffer = io.BytesIO()
+    fig.write_image(buffer, format="png")
+    buffer.seek(0)
+    png_bytes = buffer.read()
+    return png_bytes
