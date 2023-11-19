@@ -14,7 +14,7 @@ from IPython.display import display, Image
 from datetime import datetime
 
 
-def df_to_png(df, byte: bool = False):
+def df_to_png(df):
     new_df = weekday_division(df)
     new_df, bold = add_weekday_to_df(new_df)
     print(bold)
@@ -30,12 +30,8 @@ def df_to_png(df, byte: bool = False):
                          row_fill_colors=colors,
                          text_thickness=12,
                          bold_rows=bold)
-    if byte:
-        byte_ = save_dataframe_byte(fig)
-        return byte_
-    else:
-        photo = save_dataframe(fig, 'output/1.png')
-
+    byte_ = save_dataframe_byte(fig)
+    return byte_
 
 def weekday_division(df):
     arrays = df_to_array(df)
