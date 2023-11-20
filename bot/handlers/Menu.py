@@ -14,7 +14,6 @@ from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
 
 
-
 load_dotenv()
 TOKEN = os.getenv('TGBOT_API_KEY')
 TOKENYA = os.getenv('YANDEX_API_KEY')
@@ -37,8 +36,19 @@ async def menuPicker(message: types.Message, state: FSMContext):
     if remove_emojis(message.text.lower()) == 'настройки':
         await state.set_state(Settings.location)
         location = await state.get_data()
-        await message.answer(f'Вы тут: {location["location"]}', reply_markup=getSettingsKB())
-        await state.set_state(Settings.location)
+        try:
+            await message.answer(
+                f'Вы тут: {location["location"]}\nВремя уведомлений: {location["notification_time"]}',
+                reply_markup=getSettingsKB()
+            )
+        except Exception as ex:
+            await message.answer(
+                f'Вы тут: {location["location"]}',
+                reply_markup=getSettingsKB()
+            )
+            print(ex)
+
+        await state.set_state(Settings.settingPicker)
     elif remove_emojis(message.text.lower()) == 'текущая погода':
         await state.set_state(StartWithUser.location)
         data = await state.get_data()
@@ -53,7 +63,7 @@ async def menuPicker(message: types.Message, state: FSMContext):
         try:
             await state.set_state(StartWithUser.location)
             data = await state.get_data()
-            wait = await bot.send_message(chat_id=message.chat.id, text='Подождите...')
+            wait = await bot.send_message(chat_id=message.chat.id, text='Подождите...', reply_markup=types.ReplyKeyboardRemove())
             df, sun, date = parse_api(data['location'], WEATHER_API_KEY)
             photo_content = weather_graph(df, sun, date, data['location'])
             await bot.delete_message(chat_id=message.chat.id, message_id=wait.message_id)
@@ -62,7 +72,8 @@ async def menuPicker(message: types.Message, state: FSMContext):
                 photo=types.input_file.BufferedInputFile(
                     photo_content,
                     filename="weather.png"
-                )
+                ),
+                reply_markup=getMenuKB()
             )
             await state.set_state(Menu.menuPicker)
         except Exception as ex:
