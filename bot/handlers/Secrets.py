@@ -4,16 +4,18 @@ import re
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram.fsm.context import FSMContext
-from aiogram.types import FSInputFile
 from dotenv import load_dotenv
-from bot.keyboard.emoji_control import remove_emojis
+
 from bot.statements.states import Menu, Secrets
+
 from bot.schedule.converting_df_bez_xyini import df_to_png
 from bot.schedule.selected_schedule_parser import get_daily_schedule, get_weekly_schedule_group
 from bot.schedule.all_schedule_parser import getScheduleNHTK_groups
 
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SecretKB import getNhtkKB, getScheduleKB
+from bot.keyboard.emoji_control import remove_emojis
+
 
 load_dotenv()
 TOKEN = os.getenv('TGBOT_API_KEY')
@@ -83,7 +85,6 @@ async def nhtkGroup(message: types.Message, state: FSMContext):
         await message.answer('ЧТо?')
 
 
-# Тут чет дохуя ненужных строк... Их удалить верное можно? (PEP-8 BRATIK)
 async def schedulePicker(message: types.Message, state: FSMContext):
     if remove_emojis(message.text.lower()) == 'расписание на завтра':
         await state.set_state(Secrets.schedulePicker)
