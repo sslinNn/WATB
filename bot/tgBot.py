@@ -11,7 +11,7 @@ from statements.states import StartWithUser, Menu, Settings, Secrets
 
 from handlers.StartWithUser import message_handler, yes, location, accepting, location_by_number
 from handlers.Menu import menu, menuPicker
-from handlers.Settings import changeLocate
+from handlers.Settings import changeLocate, set_notification_time
 from handlers.Secrets import code, nhtk, nhtkGroup, schedulePicker
 
 
@@ -31,7 +31,8 @@ async def main():
     dp.message.register(accepting, StartWithUser.accepting)
     dp.message.register(menu, Menu.menu)
     dp.message.register(menuPicker, Menu.menuPicker)
-    dp.message.register(changeLocate, Settings.location)
+    dp.message.register(changeLocate, Settings.settingPicker)
+    dp.message.register(set_notification_time, Settings.notification_time)
     dp.message.register(code, Secrets.code)
     dp.message.register(nhtk, Secrets.nhtk)
     dp.message.register(nhtkGroup, Secrets.nhtkGroup)
