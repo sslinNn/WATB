@@ -112,15 +112,18 @@ async def schedulePicker(message: types.Message, state: FSMContext):
         await state.set_state(Secrets.schedulePicker)
         group = await state.get_data()
         pattern = r'\d{2}\.\d{2}\.\d{2}[A-Za-zА-Яа-я]?'
-        pattern_in_message = re.findall(pattern, message.text)
-        if group in pattern_in_message:
-            df = get_weekly_schedule_group(group["group"])
-            photo = df_to_png(df)
-        else:
-            df = get_weekly_schedule_teacher(group["group"])
-            photo = df_to_png(df)
-        await bot.send_photo(chat_id=message.chat.id,
-                             photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
+        pattern_in_message = re.findall(pattern, group["group"])
+        try:
+            if group["group"] in pattern_in_message:
+                df = get_weekly_schedule_group(group["group"])
+                photo = df_to_png(df)
+            else:
+                df = get_weekly_schedule_teacher(group["group"])
+                photo = df_to_png(df)
+            await bot.send_photo(chat_id=message.chat.id,
+                                 photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
+        except AttributeError as e:
+            await message.answer(text='Кажется такой даты нет!')
     elif remove_emojis(message.text.lower()) == 'меню':
         await state.set_state(Menu.menuPicker)
         await message.answer('Меню: ', reply_markup=getMenuKB())
