@@ -20,6 +20,7 @@ class Secrets(StatesGroup):
     nhtk = State()
     nhtkGroup = State()
     schedulePicker = State()
+    nhtkTeacher = State()
 
 class Settings(StatesGroup):
     settingPicker = State()
