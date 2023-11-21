@@ -1,16 +1,17 @@
 import logging
 import os
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.fsm.context import FSMContext
+from aiogram.filters import Command, CommandObject
 from dotenv import load_dotenv
 from bot.keyboard.emoji_control import remove_emojis
 from weather.getWeather import getWeather, parse_api
 from weather.graphs import weather_graph
 from bot.statements.states import StartWithUser, Menu, Settings, Secrets
-
+from bot.utils.commands import set_commands
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
-
+from bot.keyboard.SecretKB import getNhtkKB
 from bot.model.querys import select_location_from_db
 
 
@@ -24,6 +25,7 @@ dp = Dispatcher()
 
 @dp.message(Menu.menu)
 async def menu(message: types.Message, state: FSMContext):
+    await set_commands(bot)
     if message.text.lower() == 'меню':
         await state.set_state(Menu.menuPicker)
         await message.answer(f'Меню:', reply_markup=getMenuKB())
@@ -33,6 +35,7 @@ async def menu(message: types.Message, state: FSMContext):
 
 @dp.message(Menu.menuPicker)
 async def menuPicker(message: types.Message, state: FSMContext):
+    await set_commands(bot)
     if remove_emojis(message.text.lower()) == 'настройки':
         await state.set_state(Settings.location)
         # location = await state.get_data()
@@ -62,8 +65,7 @@ async def menuPicker(message: types.Message, state: FSMContext):
         except Exception as ex:
             logging.exception(ex)
             await message.answer(text='Я не знаю где вы находитесь!')
-    elif remove_emojis(message.text.lower()) == 'ввести секретный код':
-        await state.set_state(Secrets.code)
-        await message.answer('Введите секретный код!', reply_markup=types.ReplyKeyboardRemove())
     else:
         await message.answer('Такого варианта ответа нет!')
+
+

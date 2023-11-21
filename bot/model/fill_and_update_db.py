@@ -1,7 +1,7 @@
 import pandas as pd
 import sqlalchemy as db
 from collections import Counter
-from db_control import get_connetion_with_db
+from connection import get_connetion_with_db
 from sqlalchemy import inspect, create_engine, insert
 from dotenv import load_dotenv
 from bot.schedule.selected_schedule_parser import parse_all_subjects, parse_subject_teacher
