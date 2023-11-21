@@ -119,8 +119,9 @@ def get_weekly_schedule_teacher(name):
 
 def get_daily_schedule(name, date):
     import re
-    group_number_pattern = re.compile('^\\d{2}\\.\\d{2}\\.\\d{2}(п\\d)?$')
-    if group_number_pattern.match(name):
+    pattern = r'\d{2}\.\d{2}\.\d{2}[A-Za-zА-Яа-я]?'
+    pattern_in_message = re.findall(pattern, name)
+    if name in pattern_in_message:
         df = get_weekly_schedule_group(name)
         schedule = df[df['DAY'] == date][[
             'DAY',
