@@ -8,7 +8,12 @@ def insert_id_and_location_in_db(id_, location_):
             engine = get_connetion_with_db()
             meta = db.MetaData()
             users = db.Table('users', meta, autoload_with=engine)
-            conn.execute(users.insert().values([{'id': id_, 'location': location_}]))
+            query = db.text("""
+                            INSERT INTO users (id, location)
+                            VALUES (:id, :location)
+                            ON DUPLICATE KEY UPDATE location = :location
+                        """)
+            conn.execute(query, {'id': id_, 'location': location_})
             conn.commit()
     except Exception as ex:
         print(ex)
