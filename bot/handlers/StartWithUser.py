@@ -5,10 +5,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv
 from bot.model.querys import insert_id_and_location_in_db
-import io
 from weather.getLocaion import (
     getLocationFromCoordinates,
-    getLocationFromCityName,
     get_location_photo,
     get_location_from_city_name
 )
