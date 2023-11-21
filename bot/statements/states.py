@@ -11,7 +11,6 @@ class StartWithUser(StatesGroup):
 class Menu(StatesGroup):
     menu = State()
     menuPicker = State()
-
     sattings = State()
     weather = State()
 
@@ -24,7 +23,9 @@ class Secrets(StatesGroup):
     nhtkTeacher = State()
 
 class Settings(StatesGroup):
+    settingPicker = State()
     location = State()
+    notification_time = State()
 
 
 class Secret(StatesGroup):
