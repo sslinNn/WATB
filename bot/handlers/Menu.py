@@ -65,6 +65,14 @@ async def menuPicker(message: types.Message, state: FSMContext):
         except Exception as ex:
             logging.exception(ex)
             await message.answer(text='Я не знаю где вы находитесь!')
+    elif remove_emojis(message.text.lower()) == 'команды':
+        text = (f'/start - Начало\n'
+                f'/code - Ввести секретный код\n'
+                f'/available_schedule_pdf - Получить доступное расписание в .pdf '
+                f'(после команды нужно ввести номер группы или фамилию и инициалы)\n'
+                f'/daily_schedule - Расписание на определенный день\n'
+                f'(после команды введите дату')
+        await message.answer(text)
     else:
         await message.answer('Такого варианта ответа нет!')
 
