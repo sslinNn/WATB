@@ -13,7 +13,9 @@ def get_connetion_with_db():
     dbname_ = os.getenv('dbname')
     try:
         engine = create_engine(
-            f'mysql+mysqlconnector://{user_}:{passwd_}@{host_}/{dbname_}'
+            f'mysql+mysqlconnector://{user_}:{passwd_}@{host_}/{dbname_}',
+            pool_size=10,
+            max_overflow=20
         )
         return engine
     except Exception as ex:

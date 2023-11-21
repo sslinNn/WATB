@@ -1,5 +1,3 @@
-from mysql.connector.errors import IntegrityError
-
 from bot.model.connection import get_connetion_with_db
 import sqlalchemy as db
 
@@ -31,4 +29,3 @@ def select_location_from_db(id_):
 
 if __name__ == '__main__':
     print(select_location_from_db(387685744))
-

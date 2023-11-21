@@ -1,10 +1,8 @@
 import os
-import subprocess
 import pandas as pd
 import requests
 from dotenv import load_dotenv
 from translate import Translator
-import datetime
 import json
 
 pd.options.mode.chained_assignment = None
@@ -124,26 +122,7 @@ def download_json(locate: str, weather_api_key: str):
     data = response.json()
     with open("input.json", "w") as file:
         json.dump(data, file)
-#
-#
-# def retrieve_processed_data():
-#     subprocess.run(["go", "run", "parse_weather_api.go"])
-#     with open('output.json', 'r') as file:
-#         data = json.load(file)
-#     return data
-
-
-# def forecast_weather(locate: str, weather_api_key: str):
-#     download_json(locate, weather_api_key)
-#     dic = retrieve_processed_data()
-#     df = pd.DataFrame(data=[v for k, v in dic.items() if k != 'Hour'], columns=dic['Hour'])
-#     return df
 
 
 if __name__ == '__main__':
-    # print(parse_api('Казахстан, Костанайская область, Фёдоровский район, село Первомайское',
-    #                          weather_api_key=WEATHER_API_KEY))
     print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосибирск'))
-    # print(parse_api(weather_api_key=WEATHER_API_KEY, locate='Новосиб'))
-    # download_json(weather_api_key=WEATHER_API_KEY, locate='Новосибирск')
-    # print(datetime.datetime.now())

@@ -51,9 +51,6 @@ def get_location_photo(token: str, lat, long):
     response = requests.get(url=api_url).content
     return response
 
-# with open('locationData.json', 'w', encoding='utf8') as f:
-#     json.dump(location_res.json(), f, ensure_ascii=False)
-
 
 if __name__ == '__main__':
     a, b = get_location_from_city_name(TOKEN, 'Москва')

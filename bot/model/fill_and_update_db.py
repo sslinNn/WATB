@@ -1,28 +1,23 @@
-import pandas as pd
 import sqlalchemy as db
-from collections import Counter
 from connection import get_connetion_with_db
-from sqlalchemy import inspect, create_engine, insert
-from dotenv import load_dotenv
 from bot.schedule.selected_schedule_parser import parse_all_subjects, parse_subject_teacher
 from bot.schedule.all_schedule_parser import getScheduleNHTK_teachers, getScheduleNHTK_groups
-import datetime
-import os
 
 
 def create_table():
     engine = get_connetion_with_db()
-    connection = engine.connect()
     metadata = db.MetaData()
 
-    table = db.Table('schedule', metadata,
-                        db.Column('id', db.Integer, primary_key=True),
-                        db.Column('subject_id', db.Integer),
-                     db.Column('teacher_id', db.Integer),
-                     db.Column('group_id', db.Integer),
-                     db.Column('lesson_number_id', db.Integer),
-                     db.Column('time', db.Time),
-                     db.Column('date', db.Date),)
+    table = db.Table(
+        'schedule', metadata,
+        db.Column('id', db.Integer, primary_key=True),
+        db.Column('subject_id', db.Integer),
+        db.Column('teacher_id', db.Integer),
+        db.Column('group_id', db.Integer),
+        db.Column('lesson_number_id', db.Integer),
+        db.Column('time', db.Time),
+        db.Column('date', db.Date)
+    )
     metadata.create_all(engine)
 
 
@@ -48,7 +43,6 @@ def insert_into_table():
 
 
 def check_and_insert_teacher_subject():
-    table_name = 'teacher_subject'
     engine = get_connetion_with_db()
     connection = engine.connect()
     metadata = db.MetaData()
@@ -63,8 +57,6 @@ def check_and_insert_teacher_subject():
         select_stmt_t = db.select(table_t.c.id).where(table.c.title == teach)
         result_t = connection.execute(select_stmt_t)
         row_t = result_t.fetchone()
-        select_stmt = db.select(table).where(table.c.subject_id == row_s and table.c.teacher_id == row_t)
-        result = connection.execute(select_stmt)
         row = result_s.fetchone()
         if not row:
             connection.execute(table.insert().values([{'subject_id': row_s, 'teacher_id': row_t}]))
@@ -140,4 +132,3 @@ def delete():
 
 if __name__ == "__main__":
     insert_into_table()
-

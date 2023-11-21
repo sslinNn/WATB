@@ -5,8 +5,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv
 from bot.model.querys import insert_id_and_location_in_db
-import io
-from weather.getLocaion import getLocationFromCoordinates, getLocationFromCityName, get_location_photo, get_location_from_city_name
+from weather.getLocaion import (
+    getLocationFromCoordinates,
+    get_location_photo,
+    get_location_from_city_name
+)
 from bot.keyboard.emoji_control import remove_emojis
 from bot.statements.states import StartWithUser, Menu
 
@@ -133,10 +136,15 @@ async def location_by_number(message: types.Message, state: FSMContext):
         locations, cords = get_location_from_city_name(TOKENYA, city)
         await state.update_data({'location': locations[int(message.text)-1]})
         await message.answer(
-            f'Вы находитесь в: {locations[int(message.text)-1]}?',
+            f'Вы находитесь в: {locations[int(message.text)-1]}?'
+        )
+        photo_content = get_location_photo(
+            TOKENYAMAP,
+            lat=cords[int(message.text)-1][0],
+            long=cords[int(message.text)-1][1]
+        )
+        await bot.send_photo(
+            chat_id=message.chat.id,
+            photo=types.input_file.BufferedInputFile(photo_content, filename="map.png"),
             reply_markup=yesOrNo()
         )
-        photo_content = get_location_photo(TOKENYAMAP, lat=cords[int(message.text)-1][0],
-                                           long=cords[int(message.text)-1][1])
-        await bot.send_photo(chat_id=message.chat.id, photo=types.input_file.BufferedInputFile(photo_content,
-                                                                                               filename="map.png"))
