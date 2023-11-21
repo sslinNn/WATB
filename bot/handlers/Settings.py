@@ -57,4 +57,3 @@ async def set_notification_time(message: types.Message, state: FSMContext):
     time = await state.get_data()
     await message.answer(f'Вы будете получать уведемления в {time["notification_time"]}', reply_markup=getSettingsKB())
     await state.set_state(Settings.settingPicker)
-

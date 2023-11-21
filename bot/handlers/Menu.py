@@ -1,6 +1,6 @@
 import logging
 import os
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, CommandObject
 from dotenv import load_dotenv
@@ -11,13 +11,11 @@ from weather.graphs import weather_graph
 from bot.statements.states import StartWithUser, Menu, Settings, Secrets
 
 from bot.keyboard.emoji_control import remove_emojis
-from bot.keyboard.MenuKB import getMenuKB
-from bot.keyboard.SettingsKB import getSettingsKB
 from bot.utils.commands import set_commands
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
 from bot.keyboard.SecretKB import getNhtkKB
-from bot.model.querys import select_location_from_db
+
 
 
 
@@ -38,6 +36,18 @@ async def menu(message: types.Message, state: FSMContext):
     else:
         await message.answer('Такого варианта ответа нет!')
 
+@dp.message(Command('code'))
+async def secret_code(message: types.Message, command: CommandObject, state: FSMContext):
+    text = command.args
+    if text in ['nhtk', 'нхтк']:
+        await state.set_state(Secrets.nhtk)
+        await message.answer(
+            f'Вы ввели код: {text}, вы явно о чем-то знаете!'
+            f' Если вы хотите получать расписание, пожалуйста, скажите кто вы?',
+            reply_markup=getNhtkKB()
+        )
+    else:
+        await message.answer('Такого кода нет!')
 
 @dp.message(Menu.menuPicker)
 async def menuPicker(message: types.Message, state: FSMContext):
@@ -60,7 +70,6 @@ async def menuPicker(message: types.Message, state: FSMContext):
         await state.set_state(Settings.settingPicker)
     elif remove_emojis(message.text.lower()) == 'текущая погода':
         await state.set_state(StartWithUser.location)
-        data = await state.get_data()
         try:
             location = await state.get_data()
             await message.answer(text=f'{getWeather({location["location"]}, weather_api_key=WEATHER_API_KEY)}')
@@ -72,7 +81,11 @@ async def menuPicker(message: types.Message, state: FSMContext):
         try:
             await state.set_state(StartWithUser.location)
             data = await state.get_data()
-            wait = await bot.send_message(chat_id=message.chat.id, text='Подождите...', reply_markup=types.ReplyKeyboardRemove())
+            wait = await bot.send_message(
+                chat_id=message.chat.id,
+                text='Подождите...',
+                reply_markup=types.ReplyKeyboardRemove()
+            )
             df, sun, date = parse_api(data['location'], WEATHER_API_KEY)
             photo_content = weather_graph(df, sun, date, data['location'])
             await bot.delete_message(chat_id=message.chat.id, message_id=wait.message_id)
@@ -90,5 +103,3 @@ async def menuPicker(message: types.Message, state: FSMContext):
             await message.answer(text='Я не знаю где вы находитесь!')
     else:
         await message.answer('Такого варианта ответа нет!')
-
-
