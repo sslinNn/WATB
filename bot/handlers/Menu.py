@@ -10,8 +10,8 @@ from weather.graphs import weather_graph
 
 from bot.statements.states import StartWithUser, Menu, Settings, Secrets
 
-from bot.keyboard.emoji_control import remove_emojis
 from bot.utils.commands import set_commands
+from bot.keyboard.emoji_control import remove_emojis
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
 from bot.keyboard.SecretKB import getNhtkKB
