@@ -17,15 +17,16 @@ from datetime import datetime
 def df_to_png(df):
     new_df = weekday_division(df)
     new_df, bold = add_weekday_to_df(new_df)
-    print(bold)
-    row_count = len(new_df) + (bold.count(True) / 2)
-    row_size = 21.25
-    if row_count < 7:
-        row_count += 2
-    wigth = int((row_count * row_size))
+    bold_count = bold.count(True)
+    row_count = len(df['DAY'])
+    long_lesson_title = [1 for i in df['LESSON'] if len(i) > 65]
+    print(sum(long_lesson_title))
+    row_count += (bold_count * 1.45) + 2 + (sum(long_lesson_title) * 1.22)
+    row_size = 21
+    height = int((row_count * row_size))
     colors = distant_colors(new_df)
     fig = plot_dataframe(new_df, print_index=False,
-                                fig_size=(1050, wigth),
+                                fig_size=(1050, height),
                                 col_width=[100, 600, 150, 50, 50, 100],
                          row_fill_colors=colors,
                          text_thickness=12,
