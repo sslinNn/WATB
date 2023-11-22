@@ -4,18 +4,20 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, CommandObject
 from dotenv import load_dotenv
-
+import re
 from weather.getWeather import getWeather, parse_api
 from weather.graphs import weather_graph
-
+from bot.schedule.selected_schedule_parser import (get_weekly_schedule_group,
+                                                   get_weekly_schedule_teacher,
+                                                   get_daily_schedule)
 from bot.statements.states import StartWithUser, Menu, Settings, Secrets
-
+from bot.schedule.converting_df_bez_xyini import df_to_pdf, df_to_xlsx, df_to_png
 from bot.utils.commands import set_commands
 from bot.keyboard.emoji_control import remove_emojis
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
 from bot.keyboard.SecretKB import getNhtkKB
-
+from io import BytesIO
 
 
 
@@ -36,6 +38,7 @@ async def menu(message: types.Message, state: FSMContext):
     else:
         await message.answer('Такого варианта ответа нет!')
 
+
 @dp.message(Command('code'))
 async def secret_code(message: types.Message, command: CommandObject, state: FSMContext):
     text = command.args
@@ -48,6 +51,75 @@ async def secret_code(message: types.Message, command: CommandObject, state: FSM
         )
     else:
         await message.answer('Такого кода нет!')
+
+
+@dp.message(Command('available_schedule_pdf'))
+async def available_schedule_pdf(message: types.Message, command: CommandObject):
+    text = command.args
+    if text != None:
+        try:
+            pattern = r'\d{2}\.\d{2}\.\d{2}[A-Za-zА-Яа-я]?'
+            pattern_in_message = re.findall(pattern, text)
+            if text in pattern_in_message:
+                df = get_weekly_schedule_group(text)
+                pdf = df_to_pdf(df)
+            else:
+                df = get_weekly_schedule_teacher(text)
+                pdf = df_to_pdf(df)
+            await message.answer_document(document=types.input_file.BufferedInputFile(
+                    pdf,
+                    filename=f"schedule_{text}.pdf"
+                ))
+        except IndexError as e:
+            await message.answer('Убедитесь что вы все указали верно')
+            print(e)
+    else:
+        await message.answer('Введите номер группы или фамилию и инициалы преподователя')
+
+
+@dp.message(Command('available_schedule_xlsx'))
+async def available_schedule_xlsx(message: types.Message, command: CommandObject):
+    text = command.args
+    if text != None:
+        try:
+            pattern = r'\d{2}\.\d{2}\.\d{2}[A-Za-zА-Яа-я]?'
+            pattern_in_message = re.findall(pattern, text)
+            if text in pattern_in_message:
+                df = get_weekly_schedule_group(text)
+                pdf = df_to_xlsx(df)
+            else:
+                df = get_weekly_schedule_teacher(text)
+                xlsx = df_to_xlsx(df)
+            await message.answer_document(document=types.input_file.BufferedInputFile(
+                xlsx,
+                filename=f"schedule_{text}.xlsx"
+            ))
+        except IndexError as e:
+            await message.answer('Убедитесь что вы все указали верно')
+            print(e)
+    else:
+        await message.answer('Введите номер группы или фамилию и инициалы преподователя')
+
+
+@dp.message(Command('daily_schedule'))
+async def daily_schedule(message: types.Message, command: CommandObject):
+    text = command.args
+    name = text.split(' ')[0]
+    date = text.split(' ')[1]
+    if text != None:
+        try:
+            df = get_daily_schedule(name=name, date=date)
+            photo = df_to_png(df)
+            await message.answer_photo(photo=types.input_file.BufferedInputFile(
+                photo,
+                filename=f"schedule_{text}.xlsx"
+            ))
+        except IndexError as e:
+            await message.answer('Убедитесь что вы все указали верно')
+            print(e)
+    else:
+        await message.answer('Введите номер группы или фамилию и инициалы преподователя')
+
 
 @dp.message(Menu.menuPicker)
 async def menuPicker(message: types.Message, state: FSMContext):
@@ -105,9 +177,12 @@ async def menuPicker(message: types.Message, state: FSMContext):
         text = (f'/start - Начало\n'
                 f'/code - Ввести секретный код\n'
                 f'/available_schedule_pdf - Получить доступное расписание в .pdf '
-                f'(после команды нужно ввести номер группы или фамилию и инициалы)\n'
+                f'(после команды нужно ввести номер группы и если вы преподователь - фамилию и инициалы)\n'
+                f'/available_schedule_xlsx - Получить доступное расписание в .xlsx '
+                f'(после команды нужно ввести номер группы и если вы преподователь - фамилию и инициалы)\n'
                 f'/daily_schedule - Расписание на определенный день\n'
-                f'(после команды введите дату')
+                f'(после команды введите сначала группу или фамилию и инициалы преподавателя и дату\n'
+                f'Пример: /daily_schedule 09.07.11 23.11.2023)')
         await message.answer(text)
     else:
         await message.answer('Такого варианта ответа нет!')

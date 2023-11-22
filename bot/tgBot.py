@@ -10,7 +10,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from statements.states import StartWithUser, Menu, Settings, Secrets
 from aiogram.filters import Command, CommandStart
 from handlers.StartWithUser import message_handler, yes, location, accepting, location_by_number
-from handlers.Menu import menu, menuPicker, secret_code
+from handlers.Menu import (menu, menuPicker, secret_code,
+                           available_schedule_pdf, available_schedule_xlsx, daily_schedule)
 from handlers.weatger_drop import weather_drop
 
 from handlers.Settings import changeLocate, set_notification_time
@@ -29,6 +30,9 @@ async def main():
     bott = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
     dp.message.register(message_handler, CommandStart())
     dp.message.register(secret_code, Command('code'))
+    dp.message.register(available_schedule_pdf, Command('available_schedule_pdf'))
+    dp.message.register(available_schedule_xlsx, Command('available_schedule_xlsx'))
+    dp.message.register(daily_schedule, Command('daily_schedule'))
     dp.message.register(yes, StartWithUser.yes)
     dp.message.register(location, StartWithUser.location)
     dp.message.register(accepting, StartWithUser.accepting)
