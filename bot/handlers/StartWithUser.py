@@ -1,10 +1,12 @@
 import os
+
+import sqlalchemy
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from dotenv import load_dotenv
-from bot.model.querys import insert_id_and_location_in_db
+from bot.model.querys import insert_id_and_location_in_db_original
 from weather.getLocaion import (
     getLocationFromCoordinates,
     get_location_photo,
@@ -12,7 +14,7 @@ from weather.getLocaion import (
 )
 from bot.keyboard.emoji_control import remove_emojis
 from bot.statements.states import StartWithUser, Menu
-
+from bot.model.querys import Request
 from bot.keyboard.OtherKB import yesOrNo, locationKB
 
 
@@ -60,7 +62,7 @@ async def location(message: types.Message, state: FSMContext):
 
 
 @dp.message(StartWithUser.accepting)
-async def accepting(message: types.Message, state: FSMContext):
+async def accepting(message: types.Message, state: FSMContext, request: sqlalchemy.Connection):
     try:
         if remove_emojis(message.text.lower()) == 'да':
             await state.set_state(Menu.menu)
@@ -72,9 +74,12 @@ async def accepting(message: types.Message, state: FSMContext):
                 text=f'Настройка бота готова, Добро Пожаловать!',
                 reply_markup=builder.as_markup(resize_keyboard=True)
             )
+
             user_id = message.from_user.id
             location_ = await state.get_data()
-            insert_id_and_location_in_db(user_id, location_.get('location'))
+            print(location_.get('location'))
+            await Request(request).insert_id_and_location_in_db(user_id, location_.get('location'))
+            # insert_id_and_location_in_db(user_id, location_.get('location'))
         elif remove_emojis(message.text.lower()) == 'нет':
             await state.set_state(StartWithUser.accepting)
             await message.answer(

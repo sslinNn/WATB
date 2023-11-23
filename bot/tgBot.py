@@ -5,7 +5,7 @@ import sys
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
-
+from model.connection import get_connetion_with_db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from statements.states import StartWithUser, Menu, Settings, Secrets
 from aiogram.filters import Command, CommandStart
@@ -13,7 +13,7 @@ from handlers.StartWithUser import message_handler, yes, location, accepting, lo
 from handlers.Menu import (menu, menuPicker, secret_code,
                            available_schedule_pdf, available_schedule_xlsx, daily_schedule)
 from handlers.weatger_drop import weather_drop
-
+from middlewares.dbmiddleware import DBSession
 from handlers.Settings import changeLocate, set_notification_time
 from handlers.Secrets import nhtk, nhtkGroup, schedulePicker, nhtkTeacher
 
@@ -25,9 +25,12 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 # scheduler.add_job(weather_drop, trigger='date', run_date=)
+engine = get_connetion_with_db()
+
 
 async def main():
     bott = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
+    dp.update.middleware.register(DBSession(engine))
     dp.message.register(message_handler, CommandStart())
     dp.message.register(secret_code, Command('code'))
     dp.message.register(available_schedule_pdf, Command('available_schedule_pdf'))
