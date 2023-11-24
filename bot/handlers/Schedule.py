@@ -15,8 +15,7 @@ from bot.schedule.selected_schedule_parser import (
     get_weekly_schedule_group,
     get_weekly_schedule_teacher
 )
-from bot.schedule.all_schedule_parser import getScheduleNHTK_groups, getScheduleNHTK_teachers
-
+from bot.keyboard.ScheduleKB import get_chocie_day_kb
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SecretKB import getScheduleKB
 from bot.keyboard.emoji_control import remove_emojis
@@ -49,17 +48,8 @@ async def schedulePicker(message: types.Message, state: FSMContext, request: sql
         except AttributeError as e:
             await message.answer('Кажется завтра нет пар, но это не точно...')
     elif remove_emojis(message.text.lower()) == 'расписание на ...':
-        builder = ReplyKeyboardBuilder()
-        if role == 'student':
-            df = get_weekly_schedule_group(class_identifier)
-        else:
-            df = get_weekly_schedule_teacher(class_identifier)
-        days = [i for i in df['DAY'].unique()]
-        for i in days:
-            builder.add(types.KeyboardButton(text=str(i)))
-        builder.adjust(3)
         await state.set_state(Schedule.choice_day)
-        await message.answer('Выберите дату', reply_markup=builder.as_markup(resize_keyboard=True))
+        await message.answer('Выберите дату', reply_markup=get_chocie_day_kb(role, class_identifier))
     elif remove_emojis(message.text.lower()) == 'расписание на сегодня':
         await state.set_state(Schedule.schedule)
         builder = ReplyKeyboardBuilder()
@@ -78,7 +68,6 @@ async def schedulePicker(message: types.Message, state: FSMContext, request: sql
         builder = ReplyKeyboardBuilder()
         builder.row(types.KeyboardButton(text='Меню'))
         await state.set_state(Schedule.schedule)
-        group = await state.get_data()
         try:
             if role == 'student':
                 df = get_weekly_schedule_group(class_identifier)
@@ -100,10 +89,12 @@ async def schedulePicker(message: types.Message, state: FSMContext, request: sql
 
 @dp.message(Schedule.choice_day)
 async def choiceDay(message: types.Message, state: FSMContext, request: sqlalchemy.Connection):
-    class_identifier = Request(request).select_class_in_db(message.from_user.id)
-    df = get_daily_schedule(str(class_identifier), str(message.text))
-    photo = df_to_png(df)
-    await bot.send_photo(chat_id=message.chat.id,
-                         photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
-    print(e)
-    await message.answer('Выберите доступную дату')
+    if message.text.lower() != 'назад':
+        class_identifier = await Request(request).select_class_in_db(message.from_user.id)
+        df = get_daily_schedule(str(class_identifier), str(message.text))
+        photo = df_to_png(df)
+        await bot.send_photo(chat_id=message.chat.id,
+                             photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
+    elif message.text.lower() == 'назад':
+        await state.set_state(Schedule.schedule)
+        await message.answer('Расписание', reply_markup=getScheduleKB())
