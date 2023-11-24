@@ -16,7 +16,7 @@ from handlers.weatger_drop import weather_drop
 from middlewares.dbmiddleware import DBSession
 from handlers.Settings import changeLocate, set_notification_time
 from handlers.Secrets import nhtk, nhtkGroup, nhtkTeacher
-from handlers.Schedule import schedulePicker, choiceDay
+from handlers.Schedule import schedulePicker, choiceDay, choice_group_and_day
 
 load_dotenv()
 TOKEN = os.getenv('TGBOT_API_KEY')
@@ -49,6 +49,7 @@ async def main():
     dp.message.register(nhtkTeacher, Secrets.nhtkTeacher)
     dp.message.register(schedulePicker, Schedule.schedule)
     dp.message.register(choiceDay, Schedule.choice_day)
+    dp.message.register(choice_group_and_day, Schedule.choice_group_and_day)
     dp.message.register(location_by_number, StartWithUser.numbers)
     await dp.start_polling(bott)
 
