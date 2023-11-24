@@ -1,5 +1,7 @@
 import sqlalchemy
-
+from bot.schedule.selected_schedule_parser import (get_daily_schedule,
+                                                   get_weekly_schedule_group,
+                                                   get_weekly_schedule_teacher)
 from bot.model.connection import get_connetion_with_db
 import sqlalchemy as db
 from datetime import datetime
@@ -96,6 +98,19 @@ class Request:
         except Exception as e:
             print(e)
 
+    def select_role_in_db_(self, id_):
+        try:
+            query = db.text("""
+                                                    SELECT role
+                                                    FROM users
+                                                    WHERE id = :id
+                                                """)
+            result = self.conn.execute(query, {'id': id_})
+            print(result)
+            return result.fetchone()[0]
+        except Exception as e:
+            print(e)
+
 
 def select_location_from_db(id_):
     try:
@@ -127,5 +142,10 @@ def insert_id_and_location_in_db_original(id_, location_):
         print(ex)
 
 
-if __name__ == '__main__':
-    print(insert_id_and_location_in_db(666, 'hell'))
+def create_connection():
+    engine = get_connetion_with_db()
+    return engine.connect()
+
+
+# if __name__ == '__main__':
+#     g
