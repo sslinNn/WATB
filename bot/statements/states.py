@@ -38,4 +38,4 @@ class Secret(StatesGroup):
 class Schedule(StatesGroup):
     schedule = State()
     choice_day = State()
-    day = State()
+    choice_group_and_day = State()
