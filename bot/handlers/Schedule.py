@@ -19,6 +19,7 @@ from bot.keyboard.ScheduleKB import get_chocie_day_kb
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SecretKB import getScheduleKB
 from bot.keyboard.emoji_control import remove_emojis
+from bot.schedule.all_schedule_parser import getScheduleNHTK_groups, getScheduleNHTK_teachers
 
 
 load_dotenv()
@@ -80,6 +81,9 @@ async def schedulePicker(message: types.Message, state: FSMContext, request: sql
         except AttributeError as e:
             await message.answer(text='Что-то пошло не так, попробуйте снова или заново введите /code nhtk')
             print(e)
+    elif remove_emojis(message.text.lower()) == 'расписание другой группы/преподователя':
+        await state.set_state(Schedule.choice_group_and_day)
+        await message.answer('Введите номер группы или фамилию и инициалы преподователя')
     elif remove_emojis(message.text.lower()) == 'меню':
         await state.set_state(Menu.menuPicker)
         await message.answer('Меню: ', reply_markup=getMenuKB(user_id, request))
@@ -98,3 +102,23 @@ async def choiceDay(message: types.Message, state: FSMContext, request: sqlalche
     elif message.text.lower() == 'назад':
         await state.set_state(Schedule.schedule)
         await message.answer('Расписание', reply_markup=getScheduleKB())
+
+
+@dp.message(Schedule.choice_group_and_day)
+async def choice_group_and_day(message: types.Message, state: FSMContext, request: sqlalchemy.Connection):
+    await state.set_state(Schedule.schedule)
+    groups = getScheduleNHTK_groups()['GroupName'].values.tolist()
+    teachers = getScheduleNHTK_teachers()['Name'].values.tolist()
+    if message.text in groups:
+        df = get_weekly_schedule_group(message.text)
+        photo = df_to_png(df)
+        await bot.send_photo(chat_id=message.chat.id,
+                             photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
+    elif message.text in teachers:
+        df = get_weekly_schedule_group(message.text)
+        photo = df_to_png(df)
+        await bot.send_photo(chat_id=message.chat.id,
+                             photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
+    else:
+        await message.answer('Что-то пошло не так')
+
