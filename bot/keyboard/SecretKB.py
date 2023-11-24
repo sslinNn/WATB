@@ -1,5 +1,6 @@
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 import emoji
+from aiogram import types
 
 
 def getNhtkKB():
@@ -13,6 +14,7 @@ def getNhtkKB():
     kb.adjust(2)
     return kb.as_markup(resize_keyboard=True)
 
+
 def getScheduleKB():
     kb = ReplyKeyboardBuilder()
     menu_e = emoji.emojize("📋")
@@ -21,6 +23,7 @@ def getScheduleKB():
     kb.button(text=f"Расписание на сегодня{schedule_e}")
     kb.button(text=f"Расписание на ...{schedule_e}")
     kb.button(text=f"Всё доступное расписание{schedule_e}")
-    kb.button(text=f"Меню{menu_e}")
+    kb.row(types.KeyboardButton(text=f'Расписание другой группы/преподователя{schedule_e}'))
+    kb.row(types.KeyboardButton(text=f"Меню{menu_e}"))
     kb.adjust(2)
     return kb.as_markup(resize_keyboard=True)
