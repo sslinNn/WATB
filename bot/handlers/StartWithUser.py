@@ -26,12 +26,19 @@ WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+
 @dp.message(CommandStart())
 async def message_handler(message: types.Message, state: FSMContext):
+    username = message.from_user.username
     builder = ReplyKeyboardBuilder()
     builder.row(types.KeyboardButton(text='Да!'))
     await state.set_state(StartWithUser.yes)
-    await message.answer(f'Привет! Хочешь узнать погоду?', reply_markup=builder.as_markup(resize_keyboard=True))
+    if username == 'ilyx228':
+        photo_path = 'https://sun9-42.userapi.com/impg/wrShz27piTwk8i9uK2d0NIU0DXrRYDjsnYIbNA/qhBKOCK3hqo.jpg?size=1174x664&quality=95&sign=0f245e1dce5751a00d2fe468cbf104b5&c_uniq_tag=9vvw23cmdXuVmQtG0GshGRWGQaUBVSjnBZm3umTqicY&type=album'
+        await message.answer_photo(photo=photo_path, caption=f'Привет! Хочешь узнать погоду?',
+                                       reply_markup=builder.as_markup(resize_keyboard=True))
+    else:
+        await message.answer(f'Привет! Хочешь узнать погоду?', reply_markup=builder.as_markup(resize_keyboard=True))
 
 
 @dp.message(StartWithUser.yes)
@@ -111,14 +118,20 @@ async def accepting(message: types.Message, state: FSMContext, request: sqlalche
                                           f'{output}',
                                      reply_markup=builder.as_markup(resize_keyboard=True))
             else:
-                await state.update_data({'location': city})
-                await message.answer(
-                    f'Вы находитесь в: {locations[0]}?',
-                    reply_markup=yesOrNo()
-                )
-                photo_content = get_location_photo(TOKENYAMAP, lat=cords[0][0], long=cords[0][1])
-                await bot.send_photo(chat_id=message.chat.id,
-                                     photo=types.input_file.BufferedInputFile(photo_content, filename="map.png"))
+                try:
+                    await state.update_data({'location': city})
+                    await message.answer(
+                        f'Вы находитесь в: {locations[0]}?',
+                        reply_markup=yesOrNo()
+                    )
+                    photo_content = get_location_photo(TOKENYAMAP, lat=cords[0][0], long=cords[0][1])
+                    await bot.send_photo(chat_id=message.chat.id,
+                                         photo=types.input_file.BufferedInputFile(photo_content, filename="map.png"),
+                                         caption=f'Вы находитесь в: {locations[0]}?',
+                                         reply_markup=yesOrNo())
+                except Exception as e:
+                    print(e)
+                    await message.answer('Попробуйте снова')
 
     except AttributeError:
         await state.set_state(StartWithUser.accepting)
