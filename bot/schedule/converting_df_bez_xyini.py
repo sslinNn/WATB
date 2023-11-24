@@ -9,7 +9,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import pandas as pd
 from bot.schedule.table_styles import table_style
-import io
+from io import BytesIO
 from IPython.display import display, Image
 from datetime import datetime
 
@@ -20,7 +20,6 @@ def df_to_png(df):
     bold_count = bold.count(True)
     row_count = len(df['DAY'])
     long_lesson_title = [1 for i in df['LESSON'] if len(i) > 65]
-    print(sum(long_lesson_title))
     row_count += (bold_count * 1.45) + 2 + (sum(long_lesson_title) * 1.22)
     row_size = 21
     height = int((row_count * row_size))
@@ -78,18 +77,21 @@ def df_to_array(df):
     return result
 
 
-def df_to_pdf(df, file_path):
-    array_of_arrays = df_to_array(df)
-    #settings
+def df_to_pdf(df):
+    new_df = weekday_division(df)
+    new_df, bold = add_weekday_to_df(new_df)
+    pdf_buffer = BytesIO()
     pdfmetrics.registerFont(TTFont('Arial', 'arial.ttf'))
-    pdf = SimpleDocTemplate(file_path, pagesize=letter)
+    pdf = SimpleDocTemplate(pdf_buffer, pagesize=letter)
     addMapping('Arial', 0, 0, 'Arial')
-    table = Table(array_of_arrays)
+    table = Table([new_df.columns.tolist()] + new_df.values.tolist())
     ts = table_style
     table.setStyle(ts)
-
     elements = [table]
     pdf.build(elements)
+    pdf_bytes = pdf_buffer.getvalue()
+    pdf_buffer.close()
+    return pdf_bytes
 
 
 def distant_colors(df):
@@ -106,8 +108,17 @@ def distant_colors(df):
     return colors
 
 
+def df_to_xlsx(df):
+    excel_buffer = BytesIO()
+    excel_writer = pd.ExcelWriter(excel_buffer, engine='xlsxwriter')
+    df.to_excel(excel_writer, sheet_name='Sheet1', index=False)
+    excel_writer.close()
+    excel_data = excel_buffer.getvalue()
+    return excel_data
+
+
 if __name__ == '__main__':
     # df = get_daily_schedule(name='09.07.11', date='19.12.2023')
     df = get_weekly_schedule_group('09.07.11')
-    png_bytes = df_to_png(df)
+    png_bytes = df_to_xlsx(df)
 

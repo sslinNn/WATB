@@ -1,4 +1,6 @@
 import os
+
+import sqlalchemy
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
@@ -20,7 +22,7 @@ dp = Dispatcher()
 
 
 @dp.message(Settings.settingPicker)
-async def changeLocate(message: types.Message, state: FSMContext):
+async def changeLocate(message: types.Message, state: FSMContext, request: sqlalchemy.Connection):
     try:
         if remove_emojis(message.text.lower()) == 'изменить месторасположения':
             await state.set_state(StartWithUser.accepting)
@@ -37,7 +39,7 @@ async def changeLocate(message: types.Message, state: FSMContext):
             await state.set_state(Menu.menuPicker)
             await message.answer(
                 f'Меню:',
-                reply_markup=getMenuKB()
+                reply_markup=getMenuKB(message.from_user.id, request)
             )
 
         else:

@@ -33,3 +33,9 @@ class Secret(StatesGroup):
     nhtkKey = State()
     role = State()
     getrole = State()
+
+
+class Schedule(StatesGroup):
+    schedule = State()
+    choice_day = State()
+    day = State()
