@@ -1,7 +1,6 @@
 from typing import Callable, Awaitable, Dict, Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Message
-from bot.model.querys import select_location_from_db
 from weather.graphs import weather_graph
 from weather.getWeather import parse_api
 from bot.keyboard.emoji_control import remove_emojis

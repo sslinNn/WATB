@@ -1,5 +1,8 @@
 import os
+
+import sqlalchemy
 from aiogram import Bot, Dispatcher, types
+from bot.model.querys import Request
 from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
 from weather import getWeather

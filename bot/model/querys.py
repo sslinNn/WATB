@@ -96,6 +96,36 @@ class Request:
         except Exception as e:
             print(e)
 
+    async def insert_notofication_time(self, id_, notification_time):
+        try:
+            query = db.text(
+                """
+                INSERT INTO users (id, notification_time)
+                VALUES (:id, :notification_time)
+                ON DUPLICATE KEY UPDATE notification_time = :notification_time
+                """
+            )
+            self.conn.execute(query, {'id': id_, 'notification_time': notification_time})
+            self.conn.commit()
+        except Exception as e:
+            print(e)
+
+
+
+
+    async def select_notofication_time_from_db_by_id(self, id_):
+        try:
+            query = db.text("""
+                                                    SELECT notofication_time
+                                                    FROM users
+                                                    WHERE id = :id
+                                                """)
+            result = self.conn.execute(query, {'id': id_})
+            print(result)
+            return result.fetchone()[0]
+        except Exception as e:
+            print(e)
+
 
 def select_location_from_db(id_):
     try:
@@ -127,5 +157,8 @@ def insert_id_and_location_in_db_original(id_, location_):
         print(ex)
 
 
+
+
 if __name__ == '__main__':
-    print(insert_id_and_location_in_db(666, 'hell'))
+    db = Request(request).insert_notofication_time(id_=123, notification_time='08:40:00')
+    # print(insert_not(666, 'hell'))

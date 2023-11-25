@@ -12,10 +12,10 @@ def getMenuKB(user_id, request: sqlalchemy.Connection):
     clipboard_emoji = emoji.emojize(":clipboard:")
     schedule_e = emoji.emojize(":spiral_notepad:")
     kb = ReplyKeyboardBuilder()
-    if class_identifier:
-        kb.button(text=f"Расписание{schedule_e}")
     kb.button(text=f"Текущая Погода{thermometer_emoji}")
     kb.button(text=f"Прогноз погоды на сегодня{calendar_emoji}")
+    if class_identifier:
+        kb.button(text=f"Расписание{schedule_e}")
     kb.button(text=f"Настройки{gear_emoji}")
     kb.button(text=f"Команды{clipboard_emoji}")
     kb.adjust(2)

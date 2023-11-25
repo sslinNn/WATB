@@ -6,13 +6,11 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 from model.connection import get_connetion_with_db
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from statements.states import StartWithUser, Menu, Settings, Secrets, Schedule
 from aiogram.filters import Command, CommandStart
 from handlers.StartWithUser import message_handler, yes, location, accepting, location_by_number
 from handlers.Menu import (menu, menuPicker, secret_code,
                            available_schedule_pdf, available_schedule_xlsx, daily_schedule)
-from handlers.weatger_drop import weather_drop
 from middlewares.dbmiddleware import DBSession
 from handlers.Settings import changeLocate, set_notification_time
 from handlers.Secrets import nhtk, nhtkGroup, nhtkTeacher
@@ -24,8 +22,6 @@ TOKENYA = os.getenv('YANDEX_API_KEY')
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
-# scheduler.add_job(weather_drop, trigger='date', run_date=)
 engine = get_connetion_with_db()
 
 

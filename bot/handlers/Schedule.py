@@ -1,6 +1,5 @@
 import datetime
 import os
-import re
 
 import sqlalchemy
 from aiogram import Bot, Dispatcher, types
@@ -105,5 +104,4 @@ async def choiceDay(message: types.Message, state: FSMContext, request: sqlalche
     photo = df_to_png(df)
     await bot.send_photo(chat_id=message.chat.id,
                          photo=types.input_file.BufferedInputFile(photo, filename="schedule.png"))
-    print(e)
     await message.answer('Выберите доступную дату')

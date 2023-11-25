@@ -9,6 +9,7 @@ from weather.getLocaion import getLocationFromCoordinates
 
 from bot.statements.states import StartWithUser, Menu, Settings
 
+from bot.model.querys import Request
 from bot.keyboard.OtherKB import locationKB, yesOrNo
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import timeKB, getSettingsKB
@@ -53,9 +54,12 @@ async def changeLocate(message: types.Message, state: FSMContext, request: sqlal
         await message.answer(f'Вы находитесь в: {userLocation}?', reply_markup=yesOrNo())
 
 @dp.message(Settings.notification_time)
-async def set_notification_time(message: types.Message, state: FSMContext):
+async def set_notification_time(message: types.Message, state: FSMContext, request: sqlalchemy.Connection):
     await state.set_state(Settings.notification_time)
     await state.update_data({'notification_time': message.text})
-    time = await state.get_data()
-    await message.answer(f'Вы будете получать уведемления в {time["notification_time"]}', reply_markup=getSettingsKB())
+    data = await state.get_data()
+    time = data['notification_time'] + ':00'
+    await Request(request).insert_notofication_time(id_=message.from_user.id,
+                                                    notification_time=time)
+    await message.answer(f'Вы будете получать уведемления в {data["notification_time"]}', reply_markup=getSettingsKB())
     await state.set_state(Settings.settingPicker)

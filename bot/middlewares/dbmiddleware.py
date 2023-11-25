@@ -3,10 +3,8 @@ from typing import Callable, Awaitable, Dict, Any
 import sqlalchemy
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Message
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-from bot.model.connection import get_connetion_with_db
-import sqlalchemy as db
+
 
 
 class DBSession(BaseMiddleware):
