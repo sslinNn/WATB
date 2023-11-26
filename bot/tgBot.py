@@ -2,6 +2,10 @@ import asyncio
 import logging
 import os
 import sys
+import sqlalchemy
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from notificationScheduler import notification_sender, scheduler
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
@@ -12,6 +16,7 @@ from handlers.StartWithUser import message_handler, yes, location, accepting, lo
 from handlers.Menu import (menu, menuPicker, secret_code,
                            available_schedule_pdf, available_schedule_xlsx, daily_schedule)
 from middlewares.dbmiddleware import DBSession
+from middlewares.schedulerMiddlelawe import SchedulerMiddleware
 from handlers.Settings import changeLocate, set_notification_time
 from handlers.Secrets import nhtk, nhtkGroup, nhtkTeacher
 from handlers.Schedule import schedulePicker, choiceDay
@@ -25,9 +30,18 @@ dp = Dispatcher()
 engine = get_connetion_with_db()
 
 
+# async def send_notification(request: sqlalchemy.Connection):
+
+
+
 async def main():
     bott = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
+
+    # scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
+    # scheduler.add_job(notification_sender, trigger='date', run_date=datetime.time(hour=))
+
     dp.update.middleware.register(DBSession(engine))
+    dp.update.middleware.register(SchedulerMiddleware(scheduler=scheduler))
     dp.message.register(message_handler, CommandStart())
     dp.message.register(secret_code, Command('code'))
     dp.message.register(available_schedule_pdf, Command('available_schedule_pdf'))

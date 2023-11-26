@@ -1,12 +1,12 @@
 import logging
 import os
-
+import re
 import sqlalchemy
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, CommandObject
 from dotenv import load_dotenv
-import re
 from weather.getWeather import getWeather, parse_api
 from weather.graphs import weather_graph
 from bot.schedule.selected_schedule_parser import (get_weekly_schedule_group,
@@ -19,7 +19,6 @@ from bot.keyboard.emoji_control import remove_emojis
 from bot.keyboard.MenuKB import getMenuKB
 from bot.keyboard.SettingsKB import getSettingsKB
 from bot.keyboard.SecretKB import getNhtkKB, getScheduleKB
-from io import BytesIO
 from bot.model.querys import Request
 
 
@@ -42,7 +41,8 @@ async def menu(message: types.Message, state: FSMContext, request: sqlalchemy.Co
 
 
 @dp.message(Command('code'))
-async def secret_code(message: types.Message, command: CommandObject, state: FSMContext, request: sqlalchemy.Connection):
+async def secret_code(message: types.Message, command: CommandObject,
+                      state: FSMContext, request: sqlalchemy.Connection):
     text = command.args
     if text in ['nhtk', 'нхтк']:
         user_id = message.from_user.id
@@ -131,18 +131,18 @@ async def menuPicker(message: types.Message, state: FSMContext, request: sqlalch
     if remove_emojis(message.text.lower()) == 'настройки':
         await state.set_state(Settings.location)
         location = await state.get_data()
-        try:
+        time = await Request(request).select_notification_time_from_db_by_id(id_=message.from_user.id)
+        if time:
             await message.answer(
-                f'Вы тут: {location["location"]}\nВремя уведомлений: {location["notification_time"]}',
+                f'Вы тут: {location["location"]}\n'
+                f'Время уведомлений: {"".join(list(str(time))).split(":")[0]}:{"".join(list(str(time))).split(":")[1]}',
                 reply_markup=getSettingsKB()
             )
-        except Exception as ex:
+        else:
             await message.answer(
                 f'Вы тут: {location["location"]}',
                 reply_markup=getSettingsKB()
             )
-            print(ex)
-
         await state.set_state(Settings.settingPicker)
     elif remove_emojis(message.text.lower()) == 'текущая погода':
         await state.set_state(StartWithUser.location)
@@ -196,7 +196,6 @@ async def menuPicker(message: types.Message, state: FSMContext, request: sqlalch
     elif remove_emojis(message.text.lower()) == 'расписание':
         user_id = message.from_user.id
         await state.set_state(Schedule.schedule)
-        class_identifier = Request(request).select_class_in_db(user_id)
         text = 'Расписание:'
         await message.answer(text, reply_markup=getScheduleKB())
     else:

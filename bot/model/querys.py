@@ -96,7 +96,7 @@ class Request:
         except Exception as e:
             print(e)
 
-    async def insert_notofication_time(self, id_, notification_time):
+    async def insert_notification_time(self, id_, notification_time):
         try:
             query = db.text(
                 """
@@ -113,16 +113,29 @@ class Request:
 
 
 
-    async def select_notofication_time_from_db_by_id(self, id_):
+    async def select_notification_time_from_db_by_id(self, id_):
         try:
-            query = db.text("""
-                                                    SELECT notofication_time
-                                                    FROM users
-                                                    WHERE id = :id
-                                                """)
+            query = db.text(
+                """
+                SELECT notification_time
+                FROM users 
+                WHERE id = :id
+                """
+            )
             result = self.conn.execute(query, {'id': id_})
-            print(result)
             return result.fetchone()[0]
+        except Exception as e:
+            print(e)
+
+    async def select_all_notification_time_from_db(self):
+        try:
+            query = db.text(
+                """
+                SELECT notification_time, id FROM users WHERE notification_time IS NOT null
+                """
+            )
+            result = self.conn.execute(query)
+            return result.fetchall()
         except Exception as e:
             print(e)
 
@@ -160,5 +173,5 @@ def insert_id_and_location_in_db_original(id_, location_):
 
 
 if __name__ == '__main__':
-    db = Request(request).insert_notofication_time(id_=123, notification_time='08:40:00')
+    db = Request(conn=get_connetion_with_db()).select_notification_time_from_db_by_id(id_=387685744)
     # print(insert_not(666, 'hell'))

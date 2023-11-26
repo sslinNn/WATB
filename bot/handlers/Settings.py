@@ -59,7 +59,7 @@ async def set_notification_time(message: types.Message, state: FSMContext, reque
     await state.update_data({'notification_time': message.text})
     data = await state.get_data()
     time = data['notification_time'] + ':00'
-    await Request(request).insert_notofication_time(id_=message.from_user.id,
+    await Request(request).insert_notification_time(id_=message.from_user.id,
                                                     notification_time=time)
     await message.answer(f'Вы будете получать уведемления в {data["notification_time"]}', reply_markup=getSettingsKB())
     await state.set_state(Settings.settingPicker)
